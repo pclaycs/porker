@@ -8,5 +8,8 @@
 
 
         public required string HoroscopeThumbnail { get; set; }
+
+        public required string TwitterLinkRegex { get; set; }
+        public required string TwitterLinkReplacementHost { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MrPorker;
 using MrPorker.Configs;
 using MrPorker.Services;
+using Discord;
 
 Console.WriteLine("Hello, World!");
 
@@ -24,7 +25,10 @@ IServiceCollection ConfigureServices(IConfiguration configuration)
 
     return new ServiceCollection()
         .AddHttpClient()
-        .AddSingleton(new DiscordSocketClient())
+        .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+        {
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
+        }))
         .AddSingleton<InteractionService>()
         .AddSingleton<CommandHandler>()
         .AddSingleton<HoroscopeService>()

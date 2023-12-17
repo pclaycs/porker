@@ -33,7 +33,6 @@ namespace MrPorker.Commands.Horoscope
              Choice("Aquarius", 11),
              Choice("Pisces", 12)] int sign = 0)
         {
-
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"mr porker predicts...")
                 .WithThumbnailUrl(_config.HoroscopeThumbnail);
@@ -59,6 +58,7 @@ namespace MrPorker.Commands.Horoscope
             }
 
             _lastCheckedSigns[userId] = sign;
+            await DeferAsync();
 
             // Implement horoscope retrieval logic here
             var horoscope = await _horoscopeService.GetHoroscopeAsync(sign);
@@ -80,7 +80,7 @@ namespace MrPorker.Commands.Horoscope
 
             // Build the embed
             var embed = embedBuilder.Build();
-            await RespondAsync(embed: embed);
+            await FollowupAsync(embed: embed);
         }
     }
 }
