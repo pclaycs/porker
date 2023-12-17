@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MrPorker.Extensions
+﻿namespace MrPorker.Extensions
 {
     public static class StringExtensions
     {

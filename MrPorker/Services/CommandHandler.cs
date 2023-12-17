@@ -1,14 +1,9 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using MrPorker.Configs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace MrPorker.Services
 {
@@ -31,6 +26,7 @@ namespace MrPorker.Services
         {
             _client.Ready += OnReadyAsync;
             _client.InteractionCreated += OnInteractionCreatedAsync;
+            _client.MessageReceived += OnMessageReceivedAsync;
 
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
@@ -53,6 +49,20 @@ namespace MrPorker.Services
         {
             var ctx = new SocketInteractionContext(_client, interaction);
             await _interactionService.ExecuteCommandAsync(ctx, _services);
+        }
+
+        private async Task OnMessageReceivedAsync(SocketMessage message)
+        {
+            if (message.Author.IsBot) return; // Ignore bot's own messages
+
+            var twitterLink = ReplaceTwitterLinks(message.Content);
+            if (twitterLink != null)
+                await message.Channel.SendMessageAsync(twitterLink);
+        }
+        private string? ReplaceTwitterLinks(string message)
+        {
+            var match = Regex.Match(message, _botConfig.TwitterLinkRegex);
+            return match.Success ? $"{_botConfig.TwitterLinkReplacementHost}{match.Groups[3].Value}" : null;
         }
     }
 }
