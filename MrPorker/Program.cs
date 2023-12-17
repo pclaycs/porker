@@ -4,9 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MrPorker;
 using MrPorker.Configs;
-//using MrPorker.Services;
-using System;
-using System.Threading.Tasks;
 using MrPorker.Services;
 
 Console.WriteLine("Hello, World!");
@@ -26,9 +23,11 @@ IServiceCollection ConfigureServices(IConfiguration configuration)
     var botConfig = configuration.Get<BotConfig>() ?? throw new InvalidOperationException("Bot configuration not found.");
 
     return new ServiceCollection()
+        .AddHttpClient()
         .AddSingleton(new DiscordSocketClient())
         .AddSingleton<InteractionService>()
         .AddSingleton<CommandHandler>()
+        .AddSingleton<HoroscopeService>()
         .AddSingleton(botConfig)
         .AddSingleton<Bot>();
 }

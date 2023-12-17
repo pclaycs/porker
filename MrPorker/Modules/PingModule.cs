@@ -2,7 +2,7 @@
 
 namespace MrPorker.Commands
 {
-    public class PingCommand : InteractionModuleBase<SocketInteractionContext>
+    public class PingModule : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand("ping", "Replies with Pong!")]
         public async Task PingAsync()
