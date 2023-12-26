@@ -38,7 +38,6 @@ namespace MrPorker.Commands.Horoscope
                 .WithThumbnailUrl(_config.HoroscopeThumbnail);
 
             ulong userId = Context.User.Id;
-
             if (sign < 1 || sign > 12)
             {
                 if (_lastCheckedSigns.ContainsKey(userId))
@@ -58,9 +57,11 @@ namespace MrPorker.Commands.Horoscope
             }
 
             _lastCheckedSigns[userId] = sign;
+
+
+
             await DeferAsync();
 
-            // Implement horoscope retrieval logic here
             var horoscope = await _horoscopeService.GetHoroscopeAsync(sign);
 
             if (horoscope != null)
@@ -78,7 +79,6 @@ namespace MrPorker.Commands.Horoscope
                     .WithColor(Color.DarkRed);
             }
 
-            // Build the embed
             var embed = embedBuilder.Build();
             await FollowupAsync(embed: embed);
         }
