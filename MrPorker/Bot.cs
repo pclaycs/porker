@@ -5,26 +5,15 @@ using MrPorker.Services;
 
 namespace MrPorker
 {
-    public class Bot
+    public class Bot(DiscordSocketClient client, CommandHandler commandHandler, BotConfig config)
     {
-        private readonly DiscordSocketClient _client;
-        private readonly CommandHandler _commandHandler;
-        private readonly BotConfig _config;
-
-        public Bot(DiscordSocketClient client, CommandHandler commandHandler, BotConfig config)
-        {
-            _client = client;
-            _config = config;
-            _commandHandler = commandHandler;
-        }
-
         public async Task RunAsync()
         {
-            await _client.LoginAsync(TokenType.Bot, _config.BotToken);
-            await _client.StartAsync();
+            await client.LoginAsync(TokenType.Bot, config.BotToken);
+            await client.StartAsync();
 
             // Initialize the CommandHandler
-            await _commandHandler.InitializeAsync();
+            await commandHandler.InitializeAsync();
 
             // Block this task until the program is closed.
             await Task.Delay(-1);

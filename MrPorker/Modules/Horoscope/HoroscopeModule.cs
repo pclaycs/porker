@@ -5,18 +5,8 @@ using MrPorker.Services;
 
 namespace MrPorker.Commands.Horoscope
 {
-    public class HoroscopeModule : InteractionModuleBase<SocketInteractionContext>
+    public class HoroscopeModule(DatabaseService databaseService, HoroscopeService horoscopeService, BotConfig config) : InteractionModuleBase<SocketInteractionContext>()
     {
-        private static readonly Dictionary<ulong, int> _lastCheckedSigns = new();
-        private readonly HoroscopeService _horoscopeService;
-        private readonly BotConfig _config;
-
-        public HoroscopeModule(HoroscopeService horoscopeService, BotConfig config) : base()
-        {
-            _horoscopeService = horoscopeService;
-            _config = config;
-        }
-
         [SlashCommand("horoscope2", "Get the horoscope for a specific sign")]
         public async Task HoroscopeAsync(
             [Summary("sign", "Your Zodiac sign")]
@@ -33,35 +23,37 @@ namespace MrPorker.Commands.Horoscope
              Choice("Aquarius", 11),
              Choice("Pisces", 12)] int sign = 0)
         {
+            await DeferAsync();
+
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"mr porker predicts...")
-                .WithThumbnailUrl(_config.HoroscopeThumbnail);
+                .WithThumbnailUrl(config.HoroscopeThumbnail);
 
             ulong userId = Context.User.Id;
             if (sign < 1 || sign > 12)
             {
-                if (_lastCheckedSigns.ContainsKey(userId))
+                var storedSign = await databaseService.GetHoroscopeSignAsync(userId);
+                if (storedSign != null)
                 {
-                    sign = _lastCheckedSigns[userId];
+                    sign = storedSign.Sign;
                 }
                 else
                 {
                     embedBuilder
                         .WithDescription("idk ur star sign bro")
-                        .WithFooter(footer => footer.Text = "type it in and i'll remember ig")
+                        .WithFooter(footer => footer.Text = "do it once and i'll remember")
                         .WithColor(Color.DarkRed);
 
-                    await RespondAsync(embed: embedBuilder.Build());
+                    await FollowupAsync(embed: embedBuilder.Build());
                     return;
                 }
             }
+            else
+            {
+                await databaseService.SetHoroscopeSignAsync(userId, sign);
+            }
 
-            _lastCheckedSigns[userId] = sign;
-
-            await DeferAsync();
-
-            var horoscope = await _horoscopeService.GetHoroscopeAsync(sign);
-
+            var horoscope = await horoscopeService.GetHoroscopeAsync(sign);
             if (horoscope != null)
             {
                 embedBuilder
