@@ -1,8 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using MrPorker.Configs;
 using MrPorker.Data;
+using MrPorker.Data.Models;
 using MrPorker.Services;
+using System.Text.Json;
 
 namespace MrPorker
 {
@@ -26,7 +29,16 @@ namespace MrPorker
         {
             if (!context.Phrases.Any())
             {
-                var filePath = "";
+                var filePath = "Assets/phrases.json";
+                var jsonContent = await File.ReadAllTextAsync(filePath);
+                var phrasesContent = JsonSerializer.Deserialize<IList<string>>(jsonContent);
+
+                if (phrasesContent != null)
+                {
+                    var phrases = phrasesContent.Select(line => new PhraseModel { Content = line }).ToList();
+                    context.Phrases.AddRange(phrases);
+                    await context.SaveChangesAsync();
+                }
             }
         }
     }
