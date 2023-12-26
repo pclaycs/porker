@@ -7,22 +7,29 @@ using MrPorker.Configs;
 using MrPorker.Services;
 using Discord;
 using MrPorker.Data;
+using Microsoft.EntityFrameworkCore;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-using var context = new BotDbContext();
-context.Database.EnsureCreated();
-
 var services = ConfigureServices(configuration);
 var serviceProvider = services.BuildServiceProvider();
+
+// Ensure the database is created
+using (var scope = serviceProvider.CreateScope())
+{
+    var scopedServices = scope.ServiceProvider;
+    var dbContext = scopedServices.GetRequiredService<BotDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 var bot = serviceProvider.GetRequiredService<Bot>();
 await bot.RunAsync();
 
 IServiceCollection ConfigureServices(IConfiguration configuration)
 {
+    var connectionString = configuration.GetConnectionString("BotDatabase");
     var botConfig = configuration.Get<BotConfig>() ?? throw new InvalidOperationException("Bot configuration not found.");
 
     return new ServiceCollection()
@@ -36,6 +43,6 @@ IServiceCollection ConfigureServices(IConfiguration configuration)
         .AddSingleton<HoroscopeService>()
         .AddSingleton(botConfig)
         .AddSingleton<Bot>()
-        .AddDbContext<BotDbContext>()
+        .AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString))
         .AddScoped<DatabaseService>();
 }
