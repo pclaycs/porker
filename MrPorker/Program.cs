@@ -6,16 +6,18 @@ using MrPorker;
 using MrPorker.Configs;
 using MrPorker.Services;
 using Discord;
-
-Console.WriteLine("Hello, World!");
+using MrPorker.Data;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-var services = ConfigureServices(configuration);
+using var context = new BotDbContext();
+context.Database.EnsureCreated();
 
+var services = ConfigureServices(configuration);
 var serviceProvider = services.BuildServiceProvider();
+
 var bot = serviceProvider.GetRequiredService<Bot>();
 await bot.RunAsync();
 
@@ -33,5 +35,7 @@ IServiceCollection ConfigureServices(IConfiguration configuration)
         .AddSingleton<CommandHandler>()
         .AddSingleton<HoroscopeService>()
         .AddSingleton(botConfig)
-        .AddSingleton<Bot>();
+        .AddSingleton<Bot>()
+        .AddDbContext<BotDbContext>()
+        .AddScoped<DatabaseService>();
 }
