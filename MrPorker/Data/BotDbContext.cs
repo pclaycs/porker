@@ -6,6 +6,7 @@ namespace MrPorker.Data
     public class BotDbContext : DbContext
     {
         public DbSet<HoroscopeModel> Horoscopes { get; set; }
+        public DbSet<HoroscopeModel> Phrases { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
