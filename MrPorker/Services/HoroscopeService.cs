@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using MrPorker.Commands.Horoscope;
+using MrPorker.Configs;
 using MrPorker.Extensions;
 
 namespace MrPorker.Services
@@ -7,10 +8,12 @@ namespace MrPorker.Services
     public class HoroscopeService
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly BotConfig _botConfig;
 
-        public HoroscopeService(IHttpClientFactory httpClientFactory)
+        public HoroscopeService(IHttpClientFactory httpClientFactory, BotConfig config)
         {
             _httpClientFactory = httpClientFactory;
+            _botConfig = config;
         }
 
         public async Task<HoroscopeDto?> GetHoroscopeAsync(int sign, bool isTomorrow = false)
@@ -18,7 +21,7 @@ namespace MrPorker.Services
             var client = _httpClientFactory.CreateClient("HoroscopeClient");
             var date = DateTime.Now.AddDays(isTomorrow ? -1 : -2).ToString("yyyyMMdd");
 
-            var url = $"https://www.horoscope.com/us/horoscopes/general/horoscope-general-daily-tomorrow.aspx?sign={sign}&laDate={date}";
+            var url = $"{_botConfig.HoroscopeUrl}?sign={sign}&laDate={date}";
             var response = await client.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
@@ -29,9 +32,9 @@ namespace MrPorker.Services
 
                 var horoscopeDto = new HoroscopeDto
                 {
-                    Date = htmlDoc.DocumentNode.SelectSingleNode("/html/body/div[2]/main/div[1]/p[1]/strong")?.InnerText ?? string.Empty,
-                    Sign = htmlDoc.DocumentNode.SelectSingleNode("/html/body/section[2]/div/div/a/h1")?.InnerText.GetFirstWord() ?? string.Empty,
-                    Horoscope = htmlDoc.DocumentNode.SelectSingleNode("/html/body/div[2]/main/div[1]/p[1]/text()")?.InnerText[3..] ?? string.Empty
+                    Date = htmlDoc.DocumentNode.SelectSingleNode(_botConfig.HoroscopeXPathDate)?.InnerText ?? string.Empty,
+                    Sign = htmlDoc.DocumentNode.SelectSingleNode(_botConfig.HoroscopeXPathSign)?.InnerText.GetFirstWord() ?? string.Empty,
+                    Horoscope = htmlDoc.DocumentNode.SelectSingleNode(_botConfig.HoroscopeXPathHoroscope)?.InnerText[3..] ?? string.Empty
                 };
 
                 if (DateTime.Parse(horoscopeDto.Date) != DateTime.Now && !isTomorrow)
