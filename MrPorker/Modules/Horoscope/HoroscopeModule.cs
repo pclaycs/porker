@@ -58,8 +58,6 @@ namespace MrPorker.Commands.Horoscope
 
             _lastCheckedSigns[userId] = sign;
 
-
-
             await DeferAsync();
 
             var horoscope = await _horoscopeService.GetHoroscopeAsync(sign);
