@@ -1,8 +1,5 @@
 ﻿using Discord.WebSocket;
 using Discord.Interactions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using MrPorker;
 using MrPorker.Configs;
 using MrPorker.Services;
 using Discord;
@@ -13,36 +10,41 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-var services = ConfigureServices(configuration);
-var serviceProvider = services.BuildServiceProvider();
+var connectionString = configuration.GetConnectionString("BotDatabase");
+var botConfig = configuration.Get<BotConfig>() ?? throw new InvalidOperationException("Bot configuration not found.");
 
-// Ensure the database is created
-using (var scope = serviceProvider.CreateScope())
+var builder = WebApplication.CreateSlimBuilder(args);
+// Discord Bot Service
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 {
-    var scopedServices = scope.ServiceProvider;
-    var dbContext = scopedServices.GetRequiredService<BotDbContext>();
-    dbContext.Database.EnsureCreated();
-}
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
+}));
+builder.Services.AddSingleton(botConfig);
+builder.Services.AddSingleton<InteractionService>();
+builder.Services.AddSingleton<CommandService>();
+builder.Services.AddSingleton<HoroscopeService>();
+builder.Services.AddSingleton<BotService>();
+builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddSingleton<DatabaseService>();
 
-var bot = serviceProvider.GetRequiredService<Bot>();
-await bot.RunAsync();
+var app = builder.Build();
 
-IServiceCollection ConfigureServices(IConfiguration configuration)
+// Seed database
+var databaseService = app.Services.GetRequiredService<DatabaseService>();
+await databaseService.SeedDatabaseAsync();
+
+// Initialize the Discord Bot
+var botService = app.Services.GetRequiredService<BotService>();
+await botService.RunAsync();
+
+var botApi = app.MapGroup("/bot");
+
+botApi.MapGet("/ping", async (BotService bot) =>
 {
-    var connectionString = configuration.GetConnectionString("BotDatabase");
-    var botConfig = configuration.Get<BotConfig>() ?? throw new InvalidOperationException("Bot configuration not found.");
+    await bot.SendMessageAsync("pong");
+    return Results.Ok();
+});
 
-    return new ServiceCollection()
-        .AddHttpClient()
-        .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
-        {
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
-        }))
-        .AddSingleton<InteractionService>()
-        .AddSingleton<CommandHandler>()
-        .AddSingleton<HoroscopeService>()
-        .AddSingleton(botConfig)
-        .AddSingleton<Bot>()
-        .AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString))
-        .AddScoped<DatabaseService>();
-}
+
+app.Run();

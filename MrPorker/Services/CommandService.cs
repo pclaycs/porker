@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MrPorker.Services
 {
-    public class CommandHandler(DiscordSocketClient client, InteractionService interactionService, IServiceProvider services, BotConfig botConfig)
+    public class CommandService(DiscordSocketClient client, InteractionService interactionService, IServiceProvider services, BotConfig botConfig)
     {
         private readonly IServiceProvider _services = services;
 
@@ -24,9 +24,9 @@ namespace MrPorker.Services
         {
             // If you're using guild-specific commands, use the guild ID instead of null
             await interactionService.RegisterCommandsToGuildAsync(botConfig.GuildHideoutId);
-            if (client.GetChannel(botConfig.ChannelGeneralId) is IMessageChannel channel)
+            if (await client.GetChannelAsync(botConfig.ChannelGeneralId) is IMessageChannel channel)
             {
-                await channel.SendMessageAsync("Hello fuckers im new and improved");
+                await channel.SendMessageAsync("good heavens");
             }
             else
             {
