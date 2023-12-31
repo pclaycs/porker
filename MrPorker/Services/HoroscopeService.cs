@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
-using MrPorker.Commands.Horoscope;
 using MrPorker.Configs;
+using MrPorker.Data.Dtos;
 using MrPorker.Extensions;
 
 namespace MrPorker.Services

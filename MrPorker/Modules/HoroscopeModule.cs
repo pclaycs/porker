@@ -3,7 +3,7 @@ using Discord.Interactions;
 using MrPorker.Configs;
 using MrPorker.Services;
 
-namespace MrPorker.Commands.Horoscope
+namespace MrPorker.Modules
 {
     public class HoroscopeModule(DatabaseService databaseService, HoroscopeService horoscopeService, BotConfig config) : InteractionModuleBase<SocketInteractionContext>()
     {
