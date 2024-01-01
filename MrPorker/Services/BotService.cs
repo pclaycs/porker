@@ -1,30 +1,63 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using MrPorker.Configs;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace MrPorker.Services
 {
-    public class BotService(DiscordSocketClient client, CommandService commandHandler, BotConfig config)
+    public class BotService(DiscordSocketClient client, IServiceProvider services, InteractionService interactionService, BotConfig config)
     {
         public async Task RunAsync()
         {
+
+            client.Ready += OnReadyAsync;
+            client.InteractionCreated += OnInteractionCreatedAsync;
+            client.MessageReceived += OnMessageReceivedAsync;
+            await interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+
             await client.LoginAsync(TokenType.Bot, config.BotToken);
             await client.StartAsync();
-
-            // Initialize the CommandHandler
-            await commandHandler.InitializeAsync();
         }
 
-        public async Task SendMessageAsync(string content)
+        #region Handlers
+
+        private async Task OnReadyAsync()
+        {
+            // If you're using guild-specific commands, use the guild ID instead of null
+            await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
+            await SendMessageToGeneralAsync("good heavens");
+        }
+
+        private async Task OnInteractionCreatedAsync(SocketInteraction interaction)
+        {
+            var ctx = new SocketInteractionContext(client, interaction);
+            await interactionService.ExecuteCommandAsync(ctx, services);
+        }
+
+        private async Task OnMessageReceivedAsync(SocketMessage message)
+        {
+            if (message.Author.IsBot) return; // Ignore bot's own messages
+
+            var twitterLink = ReplaceTwitterLinks(message.Content);
+            if (twitterLink != null)
+                await message.Channel.SendMessageAsync(twitterLink);
+        }
+        private string? ReplaceTwitterLinks(string message)
+        {
+            var match = Regex.Match(message, config.TwitterLinkRegex);
+            return match.Success ? $"{config.TwitterLinkReplacementHost}{match.Groups[3].Value}" : null;
+        }
+
+        #endregion
+
+        public async Task SendMessageToGeneralAsync(string content)
         {
             if (await client.GetChannelAsync(config.ChannelGeneralId) is IMessageChannel channel)
-            {
                 await channel.SendMessageAsync(content);
-            }
             else
-            {
-                Console.WriteLine("Channel not found.");
-            }
+                Console.WriteLine($"Failed to send message to General, ID: {config.ChannelGeneralId}");
         }
     }
 }
