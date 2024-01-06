@@ -7,7 +7,7 @@ namespace MrPorker.Modules
 {
     public class HoroscopeModule(DatabaseService databaseService, HoroscopeService horoscopeService, BotConfig config) : InteractionModuleBase<SocketInteractionContext>()
     {
-        [SlashCommand("horoscope2", "Get the horoscope for a specific sign")]
+        [SlashCommand("horoscope", "this is addymer favourite")]
         public async Task HoroscopeAsync(
             [Summary("sign", "Your Zodiac sign")]
             [Choice("Aries", 1),

@@ -4,7 +4,7 @@ namespace MrPorker.Commands
 {
     public class PingModule : InteractionModuleBase<SocketInteractionContext>
     {
-        [SlashCommand("ping", "Replies with Pong!")]
+        [SlashCommand("ping", "pong it up lolz")]
         public async Task PingAsync()
         {
             await RespondAsync("Pong!");
