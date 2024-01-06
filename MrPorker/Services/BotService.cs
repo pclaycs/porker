@@ -26,6 +26,7 @@ namespace MrPorker.Services
         private async Task OnReadyAsync()
         {
             // If you're using guild-specific commands, use the guild ID instead of null
+            //await interactionService.AddCommandsGloballyAsync();
             await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
             await SendMessageToGeneralAsync("good heavens");
         }
@@ -39,6 +40,9 @@ namespace MrPorker.Services
         private async Task OnMessageReceivedAsync(SocketMessage message)
         {
             if (message.Author.IsBot) return; // Ignore bot's own messages
+
+            if (message.Content.ToLower().Contains("hello"))
+                await message.Channel.SendMessageAsync("Hello!");
 
             var twitterLink = ReplaceTwitterLinks(message.Content);
             if (twitterLink != null)
