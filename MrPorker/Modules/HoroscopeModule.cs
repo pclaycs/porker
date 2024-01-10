@@ -23,8 +23,9 @@ namespace MrPorker.Modules
              Choice("Aquarius", 11),
              Choice("Pisces", 12)] int sign = 0)
         {
+            // TODO can only defer for THREE seconds, or exception will be thrown. make sure loading horoscope pages doesn't take this long?
             await DeferAsync();
-
+            
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"mr porker predicts...")
                 .WithThumbnailUrl(config.HoroscopeThumbnail);
