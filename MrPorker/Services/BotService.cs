@@ -64,5 +64,13 @@ namespace MrPorker.Services
             else
                 Console.WriteLine($"Failed to send message to General, ID: {config.ChannelGeneralId}");
         }
+
+        public async Task SendFileToGeneralAsync(MemoryStream imageStream)
+        {
+            if (await client.GetChannelAsync(config.ChannelGeneralId) is IMessageChannel channel)
+                await channel.SendFileAsync(imageStream, "output.png");
+            else
+                Console.WriteLine($"Failed to send file to General, ID: {config.ChannelGeneralId}");
+        }
     }
 }
