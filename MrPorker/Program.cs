@@ -6,6 +6,7 @@ using Discord;
 using MrPorker.Data;
 using Microsoft.EntityFrameworkCore;
 using MrPorker.Api;
+using MrPorker;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -15,7 +16,7 @@ var connectionString = configuration.GetConnectionString("BotDatabase");
 var botConfig = configuration.Get<BotConfig>() ?? throw new InvalidOperationException("Bot configuration not found.");
 
 var builder = WebApplication.CreateSlimBuilder(args);
-// Discord Bot Service
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton(botConfig);
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig

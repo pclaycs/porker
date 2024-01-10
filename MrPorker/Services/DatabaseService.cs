@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MrPorker.Data;
+using MrPorker.Data.Dtos;
 using MrPorker.Data.Models;
 using System.Text.Json;
 
 namespace MrPorker.Services
 {
-    public class DatabaseService(IServiceProvider serviceProvider)
+    public class DatabaseService(IServiceProvider serviceProvider, IMapper mapper)
     {
         private async Task<TResult> WithDbContextAsync<TResult>(Func<BotDbContext, Task<TResult>> action)
         {
@@ -56,6 +58,41 @@ namespace MrPorker.Services
                 }
 
                 userHoroscope.Sign = horoscopeSign;
+                await dbContext.SaveChangesAsync();
+
+                return Task.CompletedTask;
+            });
+        }
+
+        public async Task<MeasurementDto?> GetXthMostRecentMeasurementAsync(int x)
+        {
+            if (x < 1) return null;
+
+            return await WithDbContextAsync(async dbContext =>
+            {
+                return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                    .OrderByDescending(x => x.Id)
+                    .Skip(x-1)
+                    .FirstOrDefaultAsync());
+            });
+        }
+
+        public async Task<MeasurementDto?> GetStartingMeasurement()
+        {
+            return await WithDbContextAsync(async dbContext =>
+            {
+                return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                    .FirstOrDefaultAsync());
+            });
+        }
+
+        public async Task AddMeasurementAsync(MeasurementDto measurementDto)
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                var measurementModel = mapper.Map<MeasurementModel>(measurementDto);
+                dbContext.Measurements.Add(measurementModel);
+
                 await dbContext.SaveChangesAsync();
 
                 return Task.CompletedTask;
