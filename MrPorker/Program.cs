@@ -25,9 +25,13 @@ builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 }));
 builder.Services.AddSingleton<InteractionService>();
 builder.Services.AddSingleton<BotService>();
+builder.Services.AddSingleton<AddymerBotService>();
+builder.Services.AddSingleton<AlexBotService>();
 builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<HoroscopeService>();
+builder.Services.AddSingleton<MeasurementService>();
+builder.Services.AddSingleton<FirebasePollingService>();
 
 var app = builder.Build();
 
@@ -38,6 +42,15 @@ await databaseService.SeedDatabaseAsync();
 // Initialize the Discord Bot
 var botService = app.Services.GetRequiredService<BotService>();
 await botService.RunAsync();
+
+var addymerBotService = app.Services.GetRequiredService<AddymerBotService>();
+await addymerBotService.RunAsync();
+
+var alexBotService = app.Services.GetRequiredService<AlexBotService>();
+await alexBotService.RunAsync();
+
+var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
+await firebasePollingService.StartPollingAsync();
 
 Router.ConfigureEndpoints(app);
 app.Run();

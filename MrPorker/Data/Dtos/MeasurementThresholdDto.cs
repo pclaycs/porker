@@ -1,6 +1,6 @@
-﻿namespace MrPorker.Api.Controllers.Measurement
+﻿namespace MrPorker.Data.Dtos
 {
-    public class MeasurementThreshold
+    public class MeasurementThresholdDto
     {
         public string? Category { get; set; }
         public float Value { get; set; }

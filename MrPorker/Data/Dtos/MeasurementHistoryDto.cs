@@ -1,8 +1,6 @@
-﻿using MrPorker.Data.Dtos;
-
-namespace MrPorker.Api.Controllers.Measurement
+﻿namespace MrPorker.Data.Dtos
 {
-    public class MeasurementHistory
+    public class MeasurementHistoryDto
     {
         public MeasurementDto? Today { get; set; }
         public MeasurementDto? Yesterday { get; set; }

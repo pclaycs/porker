@@ -1,22 +1,23 @@
 ﻿using System.Text.RegularExpressions;
+using MrPorker.Data.Dtos;
 
-namespace MrPorker.Api.Controllers.Measurement
+namespace MrPorker.Configs
 {
     public class MeasurementThresholdConfig
     {
-        public List<MeasurementThreshold> Weight { get; set; }
-        public List<MeasurementThreshold> BodyMassIndex { get; set; }
-        public List<MeasurementThreshold> BodyFat { get; set; }
-        public List<MeasurementThreshold> FatFreeBodyWeight { get; set; }
-        public List<MeasurementThreshold> SubcutaneousFat { get; set; }
-        public List<MeasurementThreshold> VisceralFat { get; set; }
-        public List<MeasurementThreshold> BodyWater { get; set; }
-        public List<MeasurementThreshold> SkeletalMuscle { get; set; }
-        public List<MeasurementThreshold> MuscleMass { get; set; }
-        public List<MeasurementThreshold> BoneMass { get; set; }
-        public List<MeasurementThreshold> Protein { get; set; }
-        public List<MeasurementThreshold> BasalMetabolicRate { get; set; }
-        public List<MeasurementThreshold> MetabolicAge => new()
+        public List<MeasurementThresholdDto> Weight { get; set; }
+        public List<MeasurementThresholdDto> BodyMassIndex { get; set; }
+        public List<MeasurementThresholdDto> BodyFat { get; set; }
+        public List<MeasurementThresholdDto> FatFreeBodyWeight { get; set; }
+        public List<MeasurementThresholdDto> SubcutaneousFat { get; set; }
+        public List<MeasurementThresholdDto> VisceralFat { get; set; }
+        public List<MeasurementThresholdDto> BodyWater { get; set; }
+        public List<MeasurementThresholdDto> SkeletalMuscle { get; set; }
+        public List<MeasurementThresholdDto> MuscleMass { get; set; }
+        public List<MeasurementThresholdDto> BoneMass { get; set; }
+        public List<MeasurementThresholdDto> Protein { get; set; }
+        public List<MeasurementThresholdDto> BasalMetabolicRate { get; set; }
+        public List<MeasurementThresholdDto> MetabolicAge => new()
         {
             new()
             {
@@ -46,7 +47,7 @@ namespace MrPorker.Api.Controllers.Measurement
 
         public string GetCategoryForMeasurement(string measurementName, float value)
         {
-            if (GetType().GetProperty(measurementName)?.GetValue(this) is not List<MeasurementThreshold> thresholds)
+            if (GetType().GetProperty(measurementName)?.GetValue(this) is not List<MeasurementThresholdDto> thresholds)
                 return "Error";
 
             foreach (var threshold in thresholds)

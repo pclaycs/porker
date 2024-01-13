@@ -1,60 +1,41 @@
 ﻿using MrPorker.Configs;
 using MrPorker.Data.Dtos;
-using MrPorker.Services;
 using System.Reflection;
 using HtmlAgilityPack;
-using System.IO;
 using PuppeteerSharp;
-using Newtonsoft.Json.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.RegularExpressions;
+using MrPorker.Data.Enums;
 
-
-
-namespace MrPorker.Api.Controllers.Measurement
+namespace MrPorker.Services
 {
-    public class MeasurementController
+    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService)
     {
-        private readonly BotConfig _botConfig;
-        private readonly BotService _botService;
-        private readonly DatabaseService _databaseService;
+        private readonly BotConfig _botConfig = botConfig;
+        private readonly BotService _botService = botService;
+        private readonly AddymerBotService _addymerBotService = addymerBotService;
+        private readonly AlexBotService _alexBotService = alexBotService;
+        private readonly DatabaseService _databaseService = databaseService;
 
-        private readonly string _embedTemplateHtmlContent;
-        private readonly string _measurementTemplateHtmlContent;
+        private readonly string _embedTemplateHtmlContent = File.ReadAllText(botConfig.EmbedTemplatePath);
+        private readonly string _measurementTemplateHtmlContent = File.ReadAllText(botConfig.MeasurementTemplatePath);
 
-        public MeasurementController(BotConfig botConfig, BotService botService, DatabaseService databaseService)
+        public async Task<IResult> AddMeasurementAsync(MeasurementDto measurementDto, Competitor competitor)
         {
-            _botConfig = botConfig;
-            _botService = botService;
-            _databaseService = databaseService;
-
-            // TODO CONFIGURABLE PATHS
-            var embedTemplateFilePath = "D:\\Development\\Projects\\PorkerSuite\\porker\\MrPorker\\Api\\Controllers\\Measurement\\EmbedTemplate.html";
-            _embedTemplateHtmlContent = File.ReadAllText(embedTemplateFilePath);
-
-            // TODO CONFIGURABLE PATHS
-            var measurementTemplateFilePath = "D:\\Development\\Projects\\PorkerSuite\\porker\\MrPorker\\Api\\Controllers\\Measurement\\MeasurementTemplate.html";
-            _measurementTemplateHtmlContent = File.ReadAllText(measurementTemplateFilePath);
-        }
-
-
-        public async Task<IResult> AddMeasurementAsync(MeasurementDto measurementDto)
-        {
-            await GenerateUiImagesAsync(measurementDto);
-            await _databaseService.AddMeasurementAsync(measurementDto);
+            await GenerateUiImagesAsync(measurementDto, competitor);
+            await _databaseService.AddMeasurementAsync(measurementDto, competitor);
 
             return Results.Ok();
         }
 
-        public async Task GenerateUiImagesAsync(MeasurementDto measurementDto)
+        private async Task GenerateUiImagesAsync(MeasurementDto measurementDto, Competitor competitor)
         {
-            var measurementHistory = new MeasurementHistory
+            var measurementHistory = new MeasurementHistoryDto
             {
                 Today = measurementDto,
-                Yesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1),
-                LastWeek = await _databaseService.GetXthMostRecentMeasurementAsync(7),
-                LastMonth = await _databaseService.GetXthMostRecentMeasurementAsync(30),
-                AllTime = await _databaseService.GetStartingMeasurement()
+                Yesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, competitor),
+                LastWeek = await _databaseService.GetXthMostRecentMeasurementAsync(7, competitor),
+                LastMonth = await _databaseService.GetXthMostRecentMeasurementAsync(30, competitor),
+                AllTime = await _databaseService.GetStartingMeasurement(competitor)
             };
 
             await new BrowserFetcher().DownloadAsync();
@@ -85,30 +66,43 @@ namespace MrPorker.Api.Controllers.Measurement
             }
 
             // i don't know why i called these chunks i just like the word chunk
-            await SendMessageForChunk(primaryChunk, measurementHistory, browser);
-            await SendMessageForChunk(secondaryChunk, measurementHistory, browser);
+            await SendMessageForChunk(primaryChunk, measurementHistory, browser, competitor);
+            await SendMessageForChunk(secondaryChunk, measurementHistory, browser, competitor);
 
             await browser.CloseAsync();
         }
 
-        private async Task SendMessageForChunk(List<PropertyInfo> chunk, MeasurementHistory measurementHistory, IBrowser browser)
+        private async Task SendMessageForChunk(List<PropertyInfo> chunk, MeasurementHistoryDto measurementHistory, IBrowser browser, Competitor competitor)
         {
             var embedDocument = new HtmlDocument();
             embedDocument.LoadHtml(_embedTemplateHtmlContent);
             var embedNode = embedDocument.DocumentNode.SelectSingleNode("//div[@class='embed-container']");
 
-            if (embedNode != null )
+            if (embedNode != null)
             {
                 foreach (PropertyInfo property in chunk)
                 {
                     if (property.PropertyType == typeof(float))
                     {
+                        if (string.Equals(property.Name.ToLower(), "weight"))
+                        {
+                            if (competitor == Competitor.Addymer)
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195682479802167366/live_porker_update_genji.png\"></img></div>\n";
+                            else if (competitor == Competitor.Paul)
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1193167837993373808/1195323122350559302/Untitled-10.png\"></img></div>\n";
+                            else if (competitor == Competitor.Alex)
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195700820533051487/fredorker.png\"></img></div>\n";
+                        }
+
+                        if (!string.Equals(property.Name.ToLower(), "weight") && !string.Equals(property.Name.ToLower(), "bodywater"))
+                            embedNode.InnerHtml += "<div class=\"top-spacer\"></div>\n";
+
                         float value = (float)(property.GetValue(measurementHistory.Today) ?? -1);
 
                         var statName = property.Name.ToLower();
                         var statNameFormatted = MeasurementThresholdConfig.GetFormattedNameForMeasurement(property.Name);
                         var category = _botConfig.MeasurementThresholds.GetCategoryForMeasurement(property.Name, value).ToLower();
-                        var categoryClass = Regex.Replace(_botConfig.MeasurementThresholds.GetCategoryForMeasurement(property.Name, value).ToLower(), @"\s+", "");;
+                        var categoryClass = Regex.Replace(_botConfig.MeasurementThresholds.GetCategoryForMeasurement(property.Name, value).ToLower(), @"\s+", ""); ;
                         var stat = $"{value}{MeasurementThresholdConfig.GetUnitForMeasurement(property.Name)}";
                         var deltaYesterdayFormatted = GetFormattedDelta(property, measurementHistory.Yesterday, value);
                         var deltaLastWeekFormatted = GetFormattedDelta(property, measurementHistory.LastWeek, value);
@@ -127,6 +121,7 @@ namespace MrPorker.Api.Controllers.Measurement
                             .Replace("{{TOTAL-DELTA}}", deltaTotalFormatted);
 
                         embedNode.InnerHtml += measurementHtmlContent + "\n";
+                        embedNode.InnerHtml += "<div class=\"top-spacer\"></div>" + "\n";
 
                         if (!string.Equals(property.Name.ToLower(), "metabolicage"))
                             embedNode.InnerHtml += "<hr/>\n";
@@ -159,7 +154,12 @@ namespace MrPorker.Api.Controllers.Measurement
                 // discord needs stream position to be reset to the beginning
                 imageStream.Position = 0;
 
-                await _botService.SendFileToGeneralAsync(imageStream);
+                if (competitor == Competitor.Addymer)
+                    await _addymerBotService.SendFileToGeneralAsync(imageStream);
+                else if (competitor == Competitor.Paul)
+                    await _botService.SendFileToGeneralAsync(imageStream);
+                else if (competitor == Competitor.Alex)
+                    await _alexBotService.SendFileToGeneralAsync(imageStream);
             }
         }
 
