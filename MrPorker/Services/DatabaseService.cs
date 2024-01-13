@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using MrPorker.Data;
 using MrPorker.Data.Dtos;
+using MrPorker.Data.Enums;
 using MrPorker.Data.Models;
+using MrPorker.Data.Models.SubModels;
 using System.Text.Json;
 
 namespace MrPorker.Services
@@ -64,34 +66,81 @@ namespace MrPorker.Services
             });
         }
 
-        public async Task<MeasurementDto?> GetXthMostRecentMeasurementAsync(int x)
+        public async Task<MeasurementDto?> GetXthMostRecentMeasurementAsync(int x, Competitor competitor)
         {
             if (x < 1) return null;
 
             return await WithDbContextAsync(async dbContext =>
             {
-                return mapper.Map<MeasurementDto>(await dbContext.Measurements
-                    .OrderByDescending(x => x.Id)
-                    .Skip(x-1)
-                    .FirstOrDefaultAsync());
+                if (competitor == Competitor.Addymer)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
+                        .OrderByDescending(x => x.Id)
+                        .Skip(x - 1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Paul)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                        .OrderByDescending(x => x.Id)
+                        .Skip(x - 1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Alex)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                        .OrderByDescending(x => x.Id)
+                        .Skip(x - 1)
+                        .FirstOrDefaultAsync());
+                }
+
+                return new MeasurementDto();
             });
         }
 
-        public async Task<MeasurementDto?> GetStartingMeasurement()
+        public async Task<MeasurementDto?> GetStartingMeasurement(Competitor competitor)
         {
             return await WithDbContextAsync(async dbContext =>
             {
-                return mapper.Map<MeasurementDto>(await dbContext.Measurements
-                    .FirstOrDefaultAsync());
+                if (competitor == Competitor.Addymer)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Paul)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Alex)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                        .FirstOrDefaultAsync());
+                }
+
+                return new MeasurementDto();
             });
         }
 
-        public async Task AddMeasurementAsync(MeasurementDto measurementDto)
+        public async Task AddMeasurementAsync(MeasurementDto measurementDto, Competitor competitor)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                var measurementModel = mapper.Map<MeasurementModel>(measurementDto);
-                dbContext.Measurements.Add(measurementModel);
+                if (competitor == Competitor.Addymer)
+                {
+                    var measurementModel = mapper.Map<AddymerMeasurementModel>(measurementDto);
+                    dbContext.AddymerMeasurements.Add(measurementModel);
+                }
+                else if (competitor == Competitor.Paul)
+                {
+                    var measurementModel = mapper.Map<PaulMeasurementModel>(measurementDto);
+                    dbContext.Measurements.Add(measurementModel);
+                }
+                else if (competitor == Competitor.Alex)
+                {
+                    var measurementModel = mapper.Map<AlexMeasurementModel>(measurementDto);
+                    dbContext.AlexMeasurements.Add(measurementModel);
+                }
 
                 await dbContext.SaveChangesAsync();
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MrPorker.Data.Dtos;
 using MrPorker.Data.Models;
+using MrPorker.Data.Models.SubModels;
 
 namespace MrPorker
 {
@@ -9,6 +10,8 @@ namespace MrPorker
         public AutoMapperProfile()
         {
             CreateMap<MeasurementDto, MeasurementModel>().ReverseMap();
+            CreateMap<MeasurementDto, AddymerMeasurementModel>().ReverseMap();
+            CreateMap<MeasurementDto, PaulMeasurementModel>().ReverseMap();
         }
     }
 }

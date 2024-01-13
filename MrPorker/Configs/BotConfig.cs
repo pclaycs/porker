@@ -1,12 +1,12 @@
-﻿using MrPorker.Api.Controllers.Measurement;
-
-namespace MrPorker.Configs
+﻿namespace MrPorker.Configs
 {
     public class BotConfig
     {
         public required string FontsDirectory { get; set; }
 
         public required string BotToken { get; set; }
+        public required string AddymerBotToken { get; set; }
+        public required string AlexBotToken { get; set; }
         public required ulong GuildHideoutId { get; set; }
         public required ulong ChannelGeneralId { get; set; }
         public required ulong ChannelZooId { get; set; }
@@ -19,6 +19,12 @@ namespace MrPorker.Configs
 
         public required string TwitterLinkRegex { get; set; }
         public required string TwitterLinkReplacementHost { get; set; }
+
+        public required string FirebaseUrl { get; set; }
+        public required int FirebasePollingInSeconds { get; set; }
+
+        public required string EmbedTemplatePath { get; set; }
+        public required string MeasurementTemplatePath { get; set; }
 
         public MeasurementThresholdConfig MeasurementThresholds { get; set; }
     }

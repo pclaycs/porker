@@ -1,5 +1,4 @@
 ﻿using MrPorker.Api.Controllers;
-using MrPorker.Api.Controllers.Measurement;
 using MrPorker.Configs;
 using MrPorker.Data.Dtos;
 using MrPorker.Services;
@@ -18,11 +17,11 @@ namespace MrPorker.Api
                 return await controller.Ping();
             });
 
-            botApi.MapPost("/measurement", async (MeasurementDto measurementDto, BotConfig botConfig, BotService bot, DatabaseService databaseService) =>
-            {
-                var controller = new MeasurementController(botConfig, bot, databaseService);
-                return await controller.AddMeasurementAsync(measurementDto);
-            });
+            //botApi.MapPost("/measurement", async (MeasurementDto measurementDto, BotConfig botConfig, BotService bot, DatabaseService databaseService) =>
+            //{
+            //    var controller = new GraphicsService(botConfig, bot, databaseService);
+            //    return await controller.AddMeasurementAsync(measurementDto);
+            //});
 
             // Add other endpoints here
         }
