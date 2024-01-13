@@ -12,6 +12,7 @@ namespace MrPorker
             CreateMap<MeasurementDto, MeasurementModel>().ReverseMap();
             CreateMap<MeasurementDto, AddymerMeasurementModel>().ReverseMap();
             CreateMap<MeasurementDto, PaulMeasurementModel>().ReverseMap();
+            CreateMap<MeasurementDto, AlexMeasurementModel>().ReverseMap();
         }
     }
 }

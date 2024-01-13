@@ -26,9 +26,9 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToGeneralAsync("id say im all ears, but im ALL BONES");
-            await SendMessageToGeneralAsync("AHAHAHAHAHAHAHAHHAHAAHAHAHAHAHA");
-            await SendMessageToGeneralAsync("AHAHAHAHAHAHAHAHAHAHAHAHA");
+            await SendMessageToGeneralAsync("GRAARAHGHGHHRAAAAAAH");
+            await SendMessageToGeneralAsync("AHAHAHAHAHAARAHGHGHHRAAAAGRRAAAAAAAHAAHAHA");
+            await SendMessageToGeneralAsync("GRAARAAAGHG IT FUCKING BURNS ARHGRRRAAAA");
         }
 
         public async Task SendMessageToGeneralAsync(string content)
