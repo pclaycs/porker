@@ -1,4 +1,6 @@
-﻿namespace MrPorker.Configs
+﻿using MrPorker.Data.Enums;
+
+namespace MrPorker.Configs
 {
     public class BotConfig
     {
@@ -27,5 +29,21 @@
         public required string MeasurementTemplatePath { get; set; }
 
         public MeasurementThresholdConfig MeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig AddymerMeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig AlexMeasurementThresholds { get; set; }
+
+        public MeasurementThresholdConfig GetMeasurementThresholdConfigByCompetitor(Competitor competitor)
+        {
+            if (competitor == Competitor.Paul)
+                return MeasurementThresholds;
+
+            if (competitor == Competitor.Addymer)
+                return AddymerMeasurementThresholds;
+
+            if (competitor == Competitor.Alex)
+                return AlexMeasurementThresholds;
+
+            return new MeasurementThresholdConfig();
+        }
     }
 }

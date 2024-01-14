@@ -101,8 +101,8 @@ namespace MrPorker.Services
 
                         var statName = property.Name.ToLower();
                         var statNameFormatted = MeasurementThresholdConfig.GetFormattedNameForMeasurement(property.Name);
-                        var category = _botConfig.MeasurementThresholds.GetCategoryForMeasurement(property.Name, value).ToLower();
-                        var categoryClass = Regex.Replace(_botConfig.MeasurementThresholds.GetCategoryForMeasurement(property.Name, value).ToLower(), @"\s+", ""); ;
+                        var category = _botConfig.GetMeasurementThresholdConfigByCompetitor(competitor).GetCategoryForMeasurement(property.Name, value).ToLower();
+                        var categoryClass = Regex.Replace(_botConfig.GetMeasurementThresholdConfigByCompetitor(competitor).GetCategoryForMeasurement(property.Name, value).ToLower(), @"\s+", ""); ;
                         var stat = $"{value}{MeasurementThresholdConfig.GetUnitForMeasurement(property.Name)}";
                         var deltaYesterdayFormatted = GetFormattedDelta(property, measurementHistory.Yesterday, value);
                         var deltaLastWeekFormatted = GetFormattedDelta(property, measurementHistory.LastWeek, value);
