@@ -89,8 +89,7 @@ namespace MrPorker.Services
                             if (competitor == Competitor.Addymer)
                                 embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195682479802167366/live_porker_update_genji.png\"></img></div>\n";
                             else if (competitor == Competitor.Paul)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.com/attachments/1035886137996234832/1195731183686930513/porkhot.png\"></img></div>\n";
-                                //embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1193167837993373808/1195323122350559302/Untitled-10.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195731183686930513/porkhot.png\"></img></div>\n";
                             else if (competitor == Competitor.Alex)
                                 embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195700820533051487/fredorker.png\"></img></div>\n";
                         }

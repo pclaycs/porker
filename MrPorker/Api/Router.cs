@@ -17,11 +17,10 @@ namespace MrPorker.Api
                 return await controller.Ping();
             });
 
-            //botApi.MapPost("/measurement", async (MeasurementDto measurementDto, BotConfig botConfig, BotService bot, DatabaseService databaseService) =>
-            //{
-            //    var controller = new GraphicsService(botConfig, bot, databaseService);
-            //    return await controller.AddMeasurementAsync(measurementDto);
-            //});
+            botApi.MapPost("/measurement", async (MeasurementDto measurementDto, MeasurementService measurementService) =>
+            {
+                return await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
+            });
 
             // Add other endpoints here
         }

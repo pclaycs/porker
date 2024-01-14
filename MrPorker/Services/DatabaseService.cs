@@ -70,27 +70,31 @@ namespace MrPorker.Services
         {
             if (x < 1) return null;
 
+            // Calculate the Unix timestamp range
+            var endDate = DateTime.UtcNow.Date.AddHours(4).AddDays(-x).ToUniversalTime();
+            var startDate = endDate.AddDays(-1);
+
+            long startTimestamp = ((DateTimeOffset)startDate).ToUnixTimeMilliseconds();
+            long endTimestamp = ((DateTimeOffset)endDate).ToUnixTimeMilliseconds();
+
             return await WithDbContextAsync(async dbContext =>
             {
                 if (competitor == Competitor.Addymer)
                 {
                     return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
-                        .OrderByDescending(x => x.Id)
-                        .Skip(x - 1)
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
                 }
                 else if (competitor == Competitor.Paul)
                 {
                     return mapper.Map<MeasurementDto>(await dbContext.Measurements
-                        .OrderByDescending(x => x.Id)
-                        .Skip(x - 1)
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
                 }
                 else if (competitor == Competitor.Alex)
                 {
                     return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
-                        .OrderByDescending(x => x.Id)
-                        .Skip(x - 1)
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
                 }
 
