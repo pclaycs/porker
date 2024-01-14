@@ -28,7 +28,7 @@ namespace MrPorker.Services
             // If you're using guild-specific commands, use the guild ID instead of null
             //await interactionService.AddCommandsGloballyAsync();
             await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
-            await SendMessageToGeneralAsync("good heavens");
+            await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
         }
 
         private async Task OnInteractionCreatedAsync(SocketInteraction interaction)
@@ -57,20 +57,30 @@ namespace MrPorker.Services
 
         #endregion
 
-        public async Task SendMessageToGeneralAsync(string content)
+        public async Task SendMessageToChannelAsync(string content, ulong channelId)
         {
-            if (await client.GetChannelAsync(config.ChannelGeneralId) is IMessageChannel channel)
+            if (await client.GetChannelAsync(channelId) is IMessageChannel channel)
                 await channel.SendMessageAsync(content);
             else
-                Console.WriteLine($"Failed to send message to General, ID: {config.ChannelGeneralId}");
+                Console.WriteLine($"Failed to send message to channel ID: {channelId}");
         }
 
-        public async Task SendFileToGeneralAsync(MemoryStream imageStream)
+        public async Task SendFileToChannelAsync(MemoryStream imageStream, ulong channelId)
         {
-            if (await client.GetChannelAsync(config.ChannelGeneralId) is IMessageChannel channel)
+            if (await client.GetChannelAsync(channelId) is IMessageChannel channel)
                 await channel.SendFileAsync(imageStream, "output.png");
             else
-                Console.WriteLine($"Failed to send file to General, ID: {config.ChannelGeneralId}");
+                Console.WriteLine($"Failed to send file to channel ID: {channelId}");
+        }
+
+        public async Task<IUserMessage?> SendEmbedToChannelAsync(Embed embed, ulong channelId, MessageComponent? components = null)
+        {
+            if (await client.GetChannelAsync(channelId) is IMessageChannel channel)
+                return await channel.SendMessageAsync(embed: embed, components: components);
+            else
+                Console.WriteLine($"Failed to send file to channel ID: {channelId}");
+
+            return null;
         }
     }
 }

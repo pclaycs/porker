@@ -22,9 +22,9 @@ namespace MrPorker.Services
             _firebaseUrl = config.FirebaseUrl;
         }
 
-        public async Task StartPollingAsync()
+        public async Task StartPollingAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var measurements = await ConsumeDataAsync();
                 if (measurements != null)

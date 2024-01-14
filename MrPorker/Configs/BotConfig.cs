@@ -10,8 +10,10 @@ namespace MrPorker.Configs
         public required string AddymerBotToken { get; set; }
         public required string AlexBotToken { get; set; }
         public required ulong GuildHideoutId { get; set; }
+
         public required ulong ChannelGeneralId { get; set; }
-        public required ulong ChannelZooId { get; set; }
+        public required ulong ChannelPorkboardId { get; set; }
+        public required ulong ChannelPorkCentralId { get; set; }
 
         public required string HoroscopeThumbnail { get; set; }
         public required string HoroscopeUrl { get; set; }
