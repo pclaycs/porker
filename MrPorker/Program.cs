@@ -49,8 +49,8 @@ await addymerBotService.RunAsync();
 var alexBotService = app.Services.GetRequiredService<AlexBotService>();
 await alexBotService.RunAsync();
 
-var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
-await firebasePollingService.StartPollingAsync();
-
 Router.ConfigureEndpoints(app);
 app.Run();
+
+var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
+await firebasePollingService.StartPollingAsync();
