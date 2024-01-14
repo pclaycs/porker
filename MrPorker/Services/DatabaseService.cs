@@ -71,7 +71,7 @@ namespace MrPorker.Services
             if (x < 1) return null;
 
             // Calculate the Unix timestamp range
-            var endDate = DateTime.UtcNow.Date.AddHours(4).AddDays(-x).ToUniversalTime();
+            var endDate = DateTime.Now.Date.AddHours(4).AddDays(-x + 1).ToUniversalTime();
             var startDate = endDate.AddDays(-1);
 
             long startTimestamp = ((DateTimeOffset)startDate).ToUnixTimeMilliseconds();
