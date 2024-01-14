@@ -24,6 +24,7 @@ namespace MrPorker.Configs
 
         public required string FirebaseUrl { get; set; }
         public required int FirebasePollingInSeconds { get; set; }
+        public required string FirebaseDatabaseSecret { get; set; }
 
         public required string EmbedTemplatePath { get; set; }
         public required string MeasurementTemplatePath { get; set; }
