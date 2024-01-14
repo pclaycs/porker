@@ -7,6 +7,7 @@ namespace MrPorker.Services
 {
     public class FirebasePollingService
     {
+        private readonly BotConfig _botConfig;
         private readonly MeasurementService _measurementService;
         private readonly HttpClient _httpClient;
         private readonly TimeSpan _pollingInterval;
@@ -14,6 +15,7 @@ namespace MrPorker.Services
 
         public FirebasePollingService(IHttpClientFactory httpClientFactory, BotConfig config, MeasurementService measurementsService)
         {
+            _botConfig = config;
             _measurementService = measurementsService;
             _httpClient = httpClientFactory.CreateClient("FirebasePollingClient");
             _pollingInterval = TimeSpan.FromSeconds(config.FirebasePollingInSeconds);
@@ -51,7 +53,7 @@ namespace MrPorker.Services
         private async Task<FirebaseDto?> ConsumeDataAsync()
         {
             // Read data
-            var response = await _httpClient.GetAsync(_firebaseUrl + ".json?auth=" + "HZz2xAeBcTTOoV53KgmF8k4xylOHo5pNAjyxUyop");
+            var response = await _httpClient.GetAsync(_firebaseUrl + ".json?auth=" + _botConfig.FirebaseDatabaseSecret);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<FirebaseDto>(json);
@@ -59,7 +61,7 @@ namespace MrPorker.Services
             if (data != null)
             {
                 // Delete data
-                var deleteResponse = await _httpClient.DeleteAsync(_firebaseUrl + ".json?auth=" + "HZz2xAeBcTTOoV53KgmF8k4xylOHo5pNAjyxUyop");
+                var deleteResponse = await _httpClient.DeleteAsync(_firebaseUrl + ".json?auth=" + _botConfig.FirebaseDatabaseSecret);
                 deleteResponse.EnsureSuccessStatusCode();
             }
 
