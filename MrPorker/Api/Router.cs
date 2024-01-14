@@ -19,7 +19,9 @@ namespace MrPorker.Api
 
             botApi.MapPost("/measurement", async (MeasurementDto measurementDto, MeasurementService measurementService) =>
             {
-                return await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
+                await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Addymer);
+                await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Alex);
+                await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
             });
 
             // Add other endpoints here
