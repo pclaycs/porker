@@ -5,6 +5,9 @@ namespace MrPorker.Configs
 {
     public class MeasurementThresholdConfig
     {
+        public int BirthYear { get; set; }
+        public int BirthMonth { get; set; }
+        public int BirthDay { get; set; }
         public List<MeasurementThresholdDto> Weight { get; set; }
         public List<MeasurementThresholdDto> BodyMassIndex { get; set; }
         public List<MeasurementThresholdDto> BodyFat { get; set; }
@@ -31,9 +34,9 @@ namespace MrPorker.Configs
             }
         };
 
-        private static float GetAge()
+        private float GetAge()
         {
-            var birthDate = new DateTime(1998, 10, 27);
+            var birthDate = new DateTime(BirthYear, BirthMonth, BirthDay);
             var currentDate = DateTime.Today;
 
             var age = currentDate.Year - birthDate.Year;
