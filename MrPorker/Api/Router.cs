@@ -11,9 +11,9 @@ namespace MrPorker.Api
         {
             var botApi = app.MapGroup("/bot");
 
-            botApi.MapGet("/ping", async (BotService bot) =>
+            botApi.MapGet("/ping", async (BotService botService, BotConfig botConfig) =>
             {
-                var controller = new PingController(bot);
+                var controller = new PingController(botService, botConfig);
                 return await controller.Ping();
             });
 
@@ -24,7 +24,10 @@ namespace MrPorker.Api
                 await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
             });
 
-            // Add other endpoints here
+            botApi.MapGet("/start", async (TimedMessagingService timedMessagingService) =>
+            {
+                await timedMessagingService.SendEmbedAsync(0, "Hello you fat fucks! It's time to weigh-in!");
+            });
         }
     }
 }

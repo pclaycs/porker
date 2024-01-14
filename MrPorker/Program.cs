@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using MrPorker.Api;
 using MrPorker;
 
+var _cancellationTokenSource = new CancellationTokenSource();
+
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
@@ -32,6 +34,7 @@ builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<HoroscopeService>();
 builder.Services.AddSingleton<MeasurementService>();
 builder.Services.AddSingleton<FirebasePollingService>();
+builder.Services.AddSingleton<TimedMessagingService>();
 
 var app = builder.Build();
 
@@ -49,9 +52,13 @@ await addymerBotService.RunAsync();
 var alexBotService = app.Services.GetRequiredService<AlexBotService>();
 await alexBotService.RunAsync();
 
-// Used for convenient debugging with Postman, this blocks the Firebase Poller currently
-//Router.ConfigureEndpoints(app);
-//app.Run();
+var timedMessagingService = app.Services.GetRequiredService<TimedMessagingService>();
+Task.Run(async () => await timedMessagingService.StartAsync(_cancellationTokenSource.Token));
 
 var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
-await firebasePollingService.StartPollingAsync();
+Task.Run(async () => await firebasePollingService.StartPollingAsync(_cancellationTokenSource.Token));
+
+// Used for convenient debugging with Postman, this blocks the Firebase Poller currently
+Router.ConfigureEndpoints(app);
+app.Run();
+

@@ -155,11 +155,11 @@ namespace MrPorker.Services
                 imageStream.Position = 0;
 
                 if (competitor == Competitor.Addymer)
-                    await _addymerBotService.SendFileToGeneralAsync(imageStream);
+                    await _addymerBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
                 else if (competitor == Competitor.Paul)
-                    await _botService.SendFileToGeneralAsync(imageStream);
+                    await _botService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
                 else if (competitor == Competitor.Alex)
-                    await _alexBotService.SendFileToGeneralAsync(imageStream);
+                    await _alexBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
             }
         }
 

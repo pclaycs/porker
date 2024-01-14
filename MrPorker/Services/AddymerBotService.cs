@@ -26,23 +26,23 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToGeneralAsync("豚ブレードを解き放つ準備が整った");
+            await SendMessageToChannelAsync("豚ブレードを解き放つ準備が整った", _config.ChannelGeneralId);
         }
 
-        public async Task SendMessageToGeneralAsync(string content)
+        public async Task SendMessageToChannelAsync(string content, ulong channelId)
         {
-            if (await _client.GetChannelAsync(_config.ChannelGeneralId) is IMessageChannel channel)
+            if (await _client.GetChannelAsync(channelId) is IMessageChannel channel)
                 await channel.SendMessageAsync(content);
             else
-                Console.WriteLine($"Failed to send message to General, ID: {_config.ChannelGeneralId}");
+                Console.WriteLine($"Failed to send message to channel ID: {channelId}");
         }
 
-        public async Task SendFileToGeneralAsync(MemoryStream imageStream)
+        public async Task SendFileToChannelAsync(MemoryStream imageStream, ulong channelId)
         {
-            if (await _client.GetChannelAsync(_config.ChannelGeneralId) is IMessageChannel channel)
+            if (await _client.GetChannelAsync(channelId) is IMessageChannel channel)
                 await channel.SendFileAsync(imageStream, "output.png");
             else
-                Console.WriteLine($"Failed to send file to General, ID: {_config.ChannelGeneralId}");
+                Console.WriteLine($"Failed to send file to channel ID: {channelId}");
         }
     }
 }

@@ -74,8 +74,8 @@ namespace MrPorker.Services
             var endDate = DateTime.Now.Date.AddHours(4).AddDays(-x + 1).ToUniversalTime();
             var startDate = endDate.AddDays(-1);
 
-            long startTimestamp = ((DateTimeOffset)startDate).ToUnixTimeMilliseconds();
-            long endTimestamp = ((DateTimeOffset)endDate).ToUnixTimeMilliseconds();
+            long startTimestamp = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
+            long endTimestamp = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
 
             return await WithDbContextAsync(async dbContext =>
             {
@@ -149,6 +149,36 @@ namespace MrPorker.Services
                 await dbContext.SaveChangesAsync();
 
                 return Task.CompletedTask;
+            });
+        }
+
+        public async Task<int> GetDaysSinceFirstMeasurementAsync()
+        {
+            return await WithDbContextAsync(async dbContext =>
+            {
+                var result = mapper.Map<MeasurementDto>(await dbContext.Measurements
+                    .OrderBy(m => m.Timestamp)
+                    .FirstOrDefaultAsync());
+
+                if (result != null)
+                {
+                    // Assuming result.Timestamp is a Unix timestamp in seconds
+                    var timestampDateTime = DateTimeOffset.FromUnixTimeSeconds(result.Timestamp).DateTime;
+
+                    // Calculate the number of days since the timestamp
+                    return Convert.ToInt32(Math.Floor((DateTime.Now - timestampDateTime).TotalDays));
+                }
+
+                return -1;
+            });
+        }
+
+        public async Task<string?> GetPhraseByIdAsync(int id)
+        {
+            return await WithDbContextAsync(async dbContext =>
+            {
+                var result = await dbContext.Phrases.FirstOrDefaultAsync(x => x.Id == id);
+                return result?.Content;
             });
         }
     }
