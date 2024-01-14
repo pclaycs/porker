@@ -49,8 +49,9 @@ await addymerBotService.RunAsync();
 var alexBotService = app.Services.GetRequiredService<AlexBotService>();
 await alexBotService.RunAsync();
 
-Router.ConfigureEndpoints(app);
-app.Run();
+// Used for convenient debugging with Postman, this blocks the Firebase Poller currently
+//Router.ConfigureEndpoints(app);
+//app.Run();
 
 var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
 await firebasePollingService.StartPollingAsync();
