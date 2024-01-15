@@ -28,6 +28,21 @@ namespace MrPorker.Api
             {
                 await timedMessagingService.SendEmbedAsync(0, "Hello you fat fucks! It's time to weigh-in!");
             });
+
+            botApi.MapGet("/unlock", async (FirebaseService firebaseService) =>
+            {
+                await firebaseService.UnlockPhone();
+            });
+
+            botApi.MapGet("/keep", async (FirebaseService firebaseService) =>
+            {
+                await firebaseService.KeepPhotos();
+            });
+
+            botApi.MapGet("/retake", async (FirebaseService firebaseService) =>
+            {
+                await firebaseService.RetakePhotos();
+            });
         }
     }
 }
