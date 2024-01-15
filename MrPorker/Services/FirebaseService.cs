@@ -1,25 +1,40 @@
-﻿using MrPorker.Configs;
+﻿using Microsoft.AspNetCore.Builder.Extensions;
+using MrPorker.Configs;
 using MrPorker.Data.Dtos;
 using MrPorker.Data.Enums;
 using Newtonsoft.Json;
 
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using System;
+using System.Threading.Tasks;
+
 namespace MrPorker.Services
 {
-    public class FirebasePollingService
+    public class FirebaseService
     {
         private readonly BotConfig _botConfig;
         private readonly MeasurementService _measurementService;
         private readonly HttpClient _httpClient;
         private readonly TimeSpan _pollingInterval;
         private readonly string _firebaseUrl;
+        private readonly string _firebaseMessagingToken;
 
-        public FirebasePollingService(IHttpClientFactory httpClientFactory, BotConfig config, MeasurementService measurementsService)
+        public FirebaseService(IHttpClientFactory httpClientFactory, BotConfig config, MeasurementService measurementsService)
         {
             _botConfig = config;
             _measurementService = measurementsService;
             _httpClient = httpClientFactory.CreateClient("FirebasePollingClient");
             _pollingInterval = TimeSpan.FromSeconds(config.FirebasePollingInSeconds);
             _firebaseUrl = config.FirebaseUrl;
+            _firebaseMessagingToken = config.FirebaseMessagingToken;
+
+            // Initialize the Firebase app
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile(config.FirebaseServiceAccountKeyJsonFilePath)
+            });
         }
 
         public async Task StartPollingAsync(CancellationToken cancellationToken)
@@ -47,6 +62,45 @@ namespace MrPorker.Services
 
                 await Task.Delay(_pollingInterval);
             }
+        }
+
+        private async Task SendFirebaseMessage(string key, string value)
+        {
+            // Create a message payload
+            var message = new Message()
+            {
+                Data = new Dictionary<string, string>()
+                {
+                    { key, value }
+                },
+                Token = _firebaseMessagingToken,
+            };
+
+            // Send a message to the device corresponding to the provided registration token
+            try
+            {
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                Console.WriteLine("Successfully sent message: " + response);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error sending message: " + e.Message);
+            }
+        }
+
+        public async Task UnlockPhone()
+        {
+            await SendFirebaseMessage("unlock", "true");
+        }
+
+        public async Task KeepPhotos()
+        {
+            await SendFirebaseMessage("action", "save");
+        }
+
+        public async Task RetakePhotos()
+        {
+            await SendFirebaseMessage("action", "retake");
         }
 
         // TODO: handle ensure success status code exception

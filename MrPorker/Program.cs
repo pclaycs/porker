@@ -33,8 +33,13 @@ builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connect
 builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<HoroscopeService>();
 builder.Services.AddSingleton<MeasurementService>();
-builder.Services.AddSingleton<FirebasePollingService>();
+builder.Services.AddSingleton<FirebaseService>();
 builder.Services.AddSingleton<TimedMessagingService>();
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5277);
+});
 
 var app = builder.Build();
 
@@ -55,7 +60,7 @@ await alexBotService.RunAsync();
 var timedMessagingService = app.Services.GetRequiredService<TimedMessagingService>();
 Task.Run(async () => await timedMessagingService.StartAsync(_cancellationTokenSource.Token));
 
-var firebasePollingService = app.Services.GetRequiredService<FirebasePollingService>();
+var firebasePollingService = app.Services.GetRequiredService<FirebaseService>();
 Task.Run(async () => await firebasePollingService.StartPollingAsync(_cancellationTokenSource.Token));
 
 // Used for convenient debugging with Postman, this blocks the Firebase Poller currently
