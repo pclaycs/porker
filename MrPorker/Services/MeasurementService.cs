@@ -8,12 +8,14 @@ using MrPorker.Data.Enums;
 
 namespace MrPorker.Services
 {
-    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService)
+    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService, EunoraBotService eunoraBotService, BluBotService bluBotService)
     {
         private readonly BotConfig _botConfig = botConfig;
         private readonly BotService _botService = botService;
         private readonly AddymerBotService _addymerBotService = addymerBotService;
         private readonly AlexBotService _alexBotService = alexBotService;
+        private readonly EunoraBotService _eunoraBotService = eunoraBotService;
+        private readonly BluBotService _bluBotService = bluBotService;
         private readonly DatabaseService _databaseService = databaseService;
 
         private readonly string _embedTemplateHtmlContent = File.ReadAllText(botConfig.EmbedTemplatePath);
@@ -42,6 +44,7 @@ namespace MrPorker.Services
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
+                //ExecutablePath = "/usr/bin/chromium-browser"
             });
 
             var measurementProperties = measurementDto.GetType().GetProperties();
@@ -92,6 +95,10 @@ namespace MrPorker.Services
                                 embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195731183686930513/porkhot.png\"></img></div>\n";
                             else if (competitor == Competitor.Alex)
                                 embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195700820533051487/fredorker.png\"></img></div>\n";
+                            else if (competitor == Competitor.Eunora)
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1197366244010111006/eunorabanner.png\"></img></div>\n";
+                            else if (competitor == Competitor.Blu)
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1197366243804586016/blubanner.png\"></img></div>\n";
                         }
 
                         if (!string.Equals(property.Name.ToLower(), "weight") && !string.Equals(property.Name.ToLower(), "bodywater"))
@@ -160,6 +167,10 @@ namespace MrPorker.Services
                     await _botService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
                 else if (competitor == Competitor.Alex)
                     await _alexBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                else if (competitor == Competitor.Eunora)
+                    await _eunoraBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                else if (competitor == Competitor.Blu)
+                    await _bluBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
             }
         }
 

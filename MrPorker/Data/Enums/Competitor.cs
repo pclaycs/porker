@@ -4,6 +4,8 @@
     {
         Paul = 1,
         Alex = 2,
-        Addymer = 3
+        Addymer = 3,
+        Eunora = 4,
+        Blu = 5,
     }
 }

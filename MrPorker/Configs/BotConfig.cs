@@ -9,6 +9,8 @@ namespace MrPorker.Configs
         public required string BotToken { get; set; }
         public required string AddymerBotToken { get; set; }
         public required string AlexBotToken { get; set; }
+        public required string EunoraBotToken { get; set; }
+        public required string BluBotToken { get; set; }
         public required ulong GuildHideoutId { get; set; }
 
         public required ulong ChannelGeneralId { get; set; }
@@ -33,9 +35,18 @@ namespace MrPorker.Configs
         public required string EmbedTemplatePath { get; set; }
         public required string MeasurementTemplatePath { get; set; }
 
+        public required string EmailAddress { get; set; }
+        public required string EmailPassword { get; set; }
+        public required string EmailEunora { get; set; }
+        public required string EmailBlu { get; set; }
+        public required int EmailPollingInSeconds { get; set; }
+
+
         public MeasurementThresholdConfig MeasurementThresholds { get; set; }
         public MeasurementThresholdConfig AddymerMeasurementThresholds { get; set; }
         public MeasurementThresholdConfig AlexMeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig EunoraMeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig BluMeasurementThresholds { get; set; }
 
         public MeasurementThresholdConfig GetMeasurementThresholdConfigByCompetitor(Competitor competitor)
         {
@@ -47,6 +58,12 @@ namespace MrPorker.Configs
 
             if (competitor == Competitor.Alex)
                 return AlexMeasurementThresholds;
+
+            if (competitor == Competitor.Eunora)
+                return EunoraMeasurementThresholds;
+
+            if (competitor == Competitor.Blu)
+                return BluMeasurementThresholds;
 
             return new MeasurementThresholdConfig();
         }
