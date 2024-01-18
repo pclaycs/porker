@@ -4,13 +4,22 @@ namespace MrPorker.Configs
 {
     public class BotConfig
     {
-        public required string FontsDirectory { get; set; }
+        public required string FontsDirectory { get; set; } // unused?
+
+        public required ulong PaulDiscordId { get; set; }
+        public required ulong AddymerDiscordId { get; set; }
+        public required ulong AlexDiscordId { get; set; }
+        public required ulong EunoraDiscordId { get; set; }
+        public required ulong BluDiscordId { get; set; }
+        
+        public required ulong ParticipantRoleId { get; set; }
 
         public required string BotToken { get; set; }
         public required string AddymerBotToken { get; set; }
         public required string AlexBotToken { get; set; }
         public required string EunoraBotToken { get; set; }
         public required string BluBotToken { get; set; }
+        public required string PersonalTrainerBotToken { get; set; }
         public required ulong GuildHideoutId { get; set; }
 
         public required ulong ChannelGeneralId { get; set; }

@@ -26,7 +26,7 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToChannelAsync("豚ブレードを解き放つ準備が整った", _config.ChannelGeneralId);
+            await SendMessageToChannelAsync("every hog.. has his day...", _config.ChannelGeneralId);
         }
 
         public async Task SendMessageToChannelAsync(string content, ulong channelId)

@@ -19,14 +19,14 @@ namespace MrPorker.Api
 
             //botApi.MapPost("/measurement", async (MeasurementDto measurementDto, MeasurementService measurementService) =>
             //{
-            //    await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Addymer);
+            //    //await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Addymer);
             //    //await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Alex);
-            //    //await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
+            //    await measurementService.AddMeasurementAsync(measurementDto, Data.Enums.Competitor.Paul);
             //});
 
             botApi.MapGet("/start", async (TimedMessagingService timedMessagingService) =>
             {
-                await timedMessagingService.SendEmbedAsync(0, "Hello you fat fucks! It's time to weigh-in!");
+                await timedMessagingService.SendStarterEmbedAsync(0, "Hello you fat fucks! It's time to weigh-in!");
             });
 
             botApi.MapGet("/unlock", async (FirebaseService firebaseService) =>
