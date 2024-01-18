@@ -11,16 +11,22 @@ namespace MrPorker.Services
         private readonly TimeSpan _messageTime;
         private bool _messageSentToday = false;
 
+        private PersonalTrainerBotService _personalTrainerBot;
+
         public TimedMessagingService(BotService botService, DatabaseService databaseService, BotConfig botConfig)
         {
             _botConfig = botConfig;
             _botService = botService;
             _databaseService = databaseService;
             _messageTime = new TimeSpan(4, 00, 0); // Example: 8:00 AM
+
+            _personalTrainerBot = new PersonalTrainerBotService(botConfig, databaseService);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            await _personalTrainerBot.RunAsync();
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 var now = DateTime.Now.TimeOfDay;
@@ -48,6 +54,16 @@ namespace MrPorker.Services
             var phrase = await _databaseService.GetPhraseByIdAsync(day);
             if (phrase == null) return false;
 
+            var result = await SendEmbedAsync(day, phrase);
+
+            await _personalTrainerBot.Judge();
+
+            return result;
+        }
+
+        public async Task<bool> SendStarterEmbedAsync(int day, string phrase)
+        {
+            await _personalTrainerBot.GiveAllRoles();
             return await SendEmbedAsync(day, phrase);
         }
 
