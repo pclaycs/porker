@@ -97,6 +97,18 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
                 }
+                else if (competitor == Competitor.Eunora)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Blu)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
+                        .FirstOrDefaultAsync());
+                }
 
                 return new MeasurementDto();
             });
@@ -119,6 +131,16 @@ namespace MrPorker.Services
                 else if (competitor == Competitor.Alex)
                 {
                     return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Eunora)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Blu)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
                         .FirstOrDefaultAsync());
                 }
 
@@ -144,6 +166,16 @@ namespace MrPorker.Services
                 {
                     var measurementModel = mapper.Map<AlexMeasurementModel>(measurementDto);
                     dbContext.AlexMeasurements.Add(measurementModel);
+                }
+                else if (competitor == Competitor.Eunora)
+                {
+                    var measurementModel = mapper.Map<EunoraMeasurementModel>(measurementDto);
+                    dbContext.EunoraMeasurements.Add(measurementModel);
+                }
+                else if (competitor == Competitor.Blu)
+                {
+                    var measurementModel = mapper.Map<BluMeasurementModel>(measurementDto);
+                    dbContext.BluMeasurements.Add(measurementModel);
                 }
 
                 await dbContext.SaveChangesAsync();

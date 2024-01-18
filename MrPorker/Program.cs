@@ -29,12 +29,15 @@ builder.Services.AddSingleton<InteractionService>();
 builder.Services.AddSingleton<BotService>();
 builder.Services.AddSingleton<AddymerBotService>();
 builder.Services.AddSingleton<AlexBotService>();
+builder.Services.AddSingleton<EunoraBotService>();
+builder.Services.AddSingleton<BluBotService>();
 builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<HoroscopeService>();
 builder.Services.AddSingleton<MeasurementService>();
 builder.Services.AddSingleton<FirebaseService>();
 builder.Services.AddSingleton<TimedMessagingService>();
+builder.Services.AddSingleton<MailPollingService>();
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -57,11 +60,20 @@ await addymerBotService.RunAsync();
 var alexBotService = app.Services.GetRequiredService<AlexBotService>();
 await alexBotService.RunAsync();
 
+var eunoraBotService = app.Services.GetRequiredService<EunoraBotService>();
+await eunoraBotService.RunAsync();
+
+var bluBotService = app.Services.GetRequiredService<BluBotService>();
+await bluBotService.RunAsync();
+
 var timedMessagingService = app.Services.GetRequiredService<TimedMessagingService>();
 Task.Run(async () => await timedMessagingService.StartAsync(_cancellationTokenSource.Token));
 
 var firebasePollingService = app.Services.GetRequiredService<FirebaseService>();
 Task.Run(async () => await firebasePollingService.StartPollingAsync(_cancellationTokenSource.Token));
+
+var mailPollingService = app.Services.GetRequiredService<MailPollingService>();
+Task.Run(async () => await mailPollingService.StartPollingAsync(_cancellationTokenSource.Token));
 
 // Used for convenient debugging with Postman, this blocks the Firebase Poller currently
 Router.ConfigureEndpoints(app);
