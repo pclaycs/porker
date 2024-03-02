@@ -13,6 +13,7 @@ namespace MrPorker.Configs
         public required ulong BluDiscordId { get; set; }
         
         public required ulong ParticipantRoleId { get; set; }
+        public required ulong TalkerRoleId { get; set; }
 
         public required string BotToken { get; set; }
         public required string AddymerBotToken { get; set; }

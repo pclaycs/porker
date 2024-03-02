@@ -70,8 +70,14 @@ namespace MrPorker.Services
         {
             if (x < 1) return null;
 
+            // Get the current date and time
+            var now = DateTime.Now;
+
+            // Check if current time is before 4 AM and adjust the reference date accordingly
+            var referenceDate = now.Hour < 4 ? now.Date.AddDays(-1) : now.Date;
+
             // Calculate the Unix timestamp range
-            var endDate = DateTime.Now.Date.AddHours(4).AddDays(-x + 1).ToUniversalTime();
+            var endDate = referenceDate.AddHours(4).AddDays(-x + 1).ToUniversalTime();
             var startDate = endDate.AddDays(-1);
 
             long startTimestamp = ((DateTimeOffset)startDate).ToUnixTimeSeconds();

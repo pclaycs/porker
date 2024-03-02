@@ -90,15 +90,15 @@ namespace MrPorker.Services
                         if (string.Equals(property.Name.ToLower(), "weight"))
                         {
                             if (competitor == Competitor.Addymer)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195682479802167366/live_porker_update_genji.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/xyniH6c.png\"></img></div>\n";
                             else if (competitor == Competitor.Paul)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195731183686930513/porkhot.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/sF72DRf.png\"></img></div>\n";
                             else if (competitor == Competitor.Alex)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1195700820533051487/fredorker.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/FAU0d5E.png\"></img></div>\n";
                             else if (competitor == Competitor.Eunora)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/867424394057220146/1197409572214812812/eunoranewbanner.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/4FlSVKz.png\"></img></div>\n";
                             else if (competitor == Competitor.Blu)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://media.discordapp.net/attachments/1035886137996234832/1197366243804586016/blubanner.png\"></img></div>\n";
+                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/NCrZxCC.png\"></img></div>\n";
                         }
 
                         if (!string.Equals(property.Name.ToLower(), "weight") && !string.Equals(property.Name.ToLower(), "bodywater"))

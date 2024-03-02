@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using MrPorker.Configs;
 using MrPorker.Data.Dtos;
 using MrPorker.Data.Enums;
+using System;
 
 namespace MrPorker.Services
 {
@@ -19,7 +20,7 @@ namespace MrPorker.Services
             _config = config;
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.Guilds,
+                GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions,
                 AlwaysDownloadUsers = true // Enable user caching
             });
         }
@@ -27,6 +28,8 @@ namespace MrPorker.Services
         public async Task RunAsync()
         {
             _client.Ready += OnReadyAsync;
+            _client.ReactionAdded += OnReactionAddedAsync;
+
             await _client.LoginAsync(TokenType.Bot, _config.PersonalTrainerBotToken);
             await _client.StartAsync();
         }
@@ -34,6 +37,61 @@ namespace MrPorker.Services
         private async Task OnReadyAsync()
         {
             await SendMessageToChannelAsync("there will be consequences for your absence.", _config.ChannelGeneralId);
+        }
+
+        private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cachedChannel, SocketReaction socketReaction)
+        {
+            if (socketReaction.Emote.Name != "❌") return;
+
+            var guild = _client.GetGuild(_config.GuildHideoutId);
+            if (cachedChannel.Id != _config.ChannelPorkCentralId) return;
+
+            var channel = guild?.GetChannel(cachedChannel.Id) as ISocketMessageChannel;
+            if (channel == null) return;
+
+            var message = await channel.GetMessageAsync(cachedMessage.Id);
+            
+            int xCount = 0;
+            foreach (var reaction in message.Reactions)
+            {
+                if (reaction.Key.Name == "⁉")
+                {
+                    var users = await message.GetReactionUsersAsync(reaction.Key, 20).FlattenAsync();
+                    if (users.Any(user => user.Id == _client.CurrentUser.Id)) return;
+                }
+
+                if (reaction.Key.Name == "❌")
+                {
+                    var users = await message.GetReactionUsersAsync(reaction.Key, 20).FlattenAsync();
+                    foreach (var reactionUser in users)
+                    {
+                        var socketUser = guild?.GetUser(reactionUser.Id);
+                        if (socketUser == null || socketUser.Id == message.Author.Id || !socketUser.Roles.Any(role => role.Id == _config.ParticipantRoleId)) continue;
+
+                        xCount++;
+                    }
+                }
+            }
+
+            if (xCount > 2)
+            {
+                var userMessage = message as IUserMessage;
+                if (userMessage == null) return;
+
+                var target = await RemoveRoleAsync(_config.GuildHideoutId, userMessage.Author.Id, _config.TalkerRoleId);
+                if (target != null)
+                {
+                    var embed = new EmbedBuilder();
+                    embed.Title = $"That's just not on.";
+                    embed.Description = $"Nah {target.DisplayName}, that was fucked. You're out. Come back tomorrow.";
+
+                    embed.Color = new Color(237, 66, 69);
+                    var builtEmbed = embed.Build();
+
+                    await userMessage.AddReactionAsync(new Emoji("⁉"));
+                    await userMessage.ReplyAsync(embed: builtEmbed);
+                }
+            }
         }
 
         public async Task SendMessageToChannelAsync(string content, ulong channelId)
@@ -83,6 +141,12 @@ namespace MrPorker.Services
             await AddRoleAsync(_config.GuildHideoutId, _config.AlexDiscordId, _config.ParticipantRoleId);
             await AddRoleAsync(_config.GuildHideoutId, _config.EunoraDiscordId, _config.ParticipantRoleId);
             await AddRoleAsync(_config.GuildHideoutId, _config.BluDiscordId, _config.ParticipantRoleId);
+
+            await AddRoleAsync(_config.GuildHideoutId, _config.PaulDiscordId, _config.TalkerRoleId);
+            await AddRoleAsync(_config.GuildHideoutId, _config.AddymerDiscordId, _config.TalkerRoleId);
+            await AddRoleAsync(_config.GuildHideoutId, _config.AlexDiscordId, _config.TalkerRoleId);
+            await AddRoleAsync(_config.GuildHideoutId, _config.EunoraDiscordId, _config.TalkerRoleId);
+            await AddRoleAsync(_config.GuildHideoutId, _config.BluDiscordId, _config.TalkerRoleId);
         }
 
         public async Task Judge()
@@ -102,6 +166,11 @@ namespace MrPorker.Services
 
         private async Task Decree(MeasurementDto? measurementDto, ulong participantId)
         {
+            if (HasRole(_config.GuildHideoutId, participantId, _config.TalkerRoleId) && measurementDto == null)
+                await RemoveRoleAsync(_config.GuildHideoutId, participantId, _config.TalkerRoleId);
+            else if (!HasRole(_config.GuildHideoutId, participantId, _config.TalkerRoleId) && measurementDto != null)
+                await AddRoleAsync(_config.GuildHideoutId, participantId, _config.TalkerRoleId);
+
             if (HasRole(_config.GuildHideoutId, participantId, _config.ParticipantRoleId) && measurementDto == null)
             {
                 var target = await RemoveRoleAsync(_config.GuildHideoutId, participantId, _config.ParticipantRoleId);
