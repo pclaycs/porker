@@ -62,12 +62,14 @@ namespace MrPorker.Services
                                     if (message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailEunora)
                                     {
                                         var measurementDto = ParseData(content, false);
-                                        await measurementService.AddMeasurementAsync(measurementDto, Competitor.Eunora);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Eunora);
                                     }
                                     else if (message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailBlu)
                                     {
                                         var measurementDto = ParseData(content, true);
-                                        await measurementService.AddMeasurementAsync(measurementDto, Competitor.Blu);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Blu);
                                     }
                                 }
                             }
@@ -85,13 +87,20 @@ namespace MrPorker.Services
             }
             finally
             {
-                _client.Inbox.Expunge();
-                _client.Disconnect(true);
+                try
+                {
+                    _client.Inbox.Expunge();
+                    _client.Disconnect(true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred: " + ex.Message);
+                }
             }
         }
 
 
-        public MeasurementDto ParseData(string data, bool isQueenslander)
+        public MeasurementDto? ParseData(string data, bool isQueenslander)
         {
             var rows = data.Split('\n');
             var headers = new string[]
@@ -104,14 +113,34 @@ namespace MrPorker.Services
             var result = headers.Zip(values, (header, value) => new { header, value })
                                 .ToDictionary(x => x.header, x => x.value);
 
-            var dto = new MeasurementDto();
-
             if (result.TryGetValue("timestamp", out var timestamp))
             {
-                var formatter = new CultureInfo("en-AU").DateTimeFormat;
-                formatter.ShortDatePattern = "yyyy-MM-dd";
-                formatter.LongTimePattern = "HH:mm:ss";
-                var localDateTime = DateTime.ParseExact(timestamp, "yyyy-MM-dd HH:mm:ss", formatter);
+                var dto = new MeasurementDto();
+                DateTime localDateTime;
+
+                try
+                {
+                    // Try the first format
+                    var formatter = new CultureInfo("en-AU").DateTimeFormat;
+                    formatter.ShortDatePattern = "yyyy-MM-dd";
+                    formatter.LongTimePattern = "HH:mm:ss";
+                    localDateTime = DateTime.ParseExact(timestamp, "yyyy-MM-dd HH:mm:ss", formatter);
+                }
+                catch (FormatException)
+                {
+                    try
+                    {
+                        // Try the second format if the first one fails
+                        var secondFormatter = new CultureInfo("en-AU").DateTimeFormat;
+                        secondFormatter.ShortDatePattern = "dd MMM yyyy 'at' HH:mm:ss";
+                        secondFormatter.LongTimePattern = "HH:mm:ss";
+                        localDateTime = DateTime.ParseExact(timestamp, "dd MMM yyyy 'at' HH:mm:ss", CultureInfo.InvariantCulture);
+                    }
+                    catch (FormatException)
+                    {
+                        return null;
+                    }
+                }
 
                 if (isQueenslander)
                 {
@@ -126,24 +155,26 @@ namespace MrPorker.Services
 
                     dto.Timestamp = new DateTimeOffset(sydneyDateTime).ToUnixTimeSeconds();
                 }
+
+                dto.Weight = float.Parse(result["weight"]);
+                dto.BodyMassIndex = float.Parse(result["bodyMassIndex"]);
+                dto.BodyFat = float.Parse(result["bodyFat"]);
+                dto.FatFreeBodyWeight = float.Parse(result["fatFreeBodyWeight"]);
+                dto.SubcutaneousFat = float.Parse(result["subcutaneousFat"]);
+                dto.VisceralFat = float.Parse(result["visceralFat"]);
+                dto.BodyWater = float.Parse(result["bodyWater"]);
+                dto.SkeletalMuscle = float.Parse(result["skeletalMuscle"]);
+                dto.MuscleMass = float.Parse(result["muscleMass"]);
+                dto.BoneMass = float.Parse(result["boneMass"]);
+                dto.Protein = float.Parse(result["protein"]);
+                dto.BasalMetabolicRate = float.Parse(result["basalMetabolicRate"]);
+                dto.MetabolicAge = float.Parse(result["metabolicAge"]);
+                dto.Remarks = result.TryGetValue("remarks", out var remarks) ? remarks : null;
+
+                return dto;
             }
 
-            dto.Weight = float.Parse(result["weight"]);
-            dto.BodyMassIndex = float.Parse(result["bodyMassIndex"]);
-            dto.BodyFat = float.Parse(result["bodyFat"]);
-            dto.FatFreeBodyWeight = float.Parse(result["fatFreeBodyWeight"]);
-            dto.SubcutaneousFat = float.Parse(result["subcutaneousFat"]);
-            dto.VisceralFat = float.Parse(result["visceralFat"]);
-            dto.BodyWater = float.Parse(result["bodyWater"]);
-            dto.SkeletalMuscle = float.Parse(result["skeletalMuscle"]);
-            dto.MuscleMass = float.Parse(result["muscleMass"]);
-            dto.BoneMass = float.Parse(result["boneMass"]);
-            dto.Protein = float.Parse(result["protein"]);
-            dto.BasalMetabolicRate = float.Parse(result["basalMetabolicRate"]);
-            dto.MetabolicAge = float.Parse(result["metabolicAge"]);
-            dto.Remarks = result.TryGetValue("remarks", out var remarks) ? remarks : null;
-
-            return dto;
+            return null;
         }
     }
 }

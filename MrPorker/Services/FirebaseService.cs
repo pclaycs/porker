@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder.Extensions;
-using MrPorker.Configs;
+﻿using MrPorker.Configs;
 using MrPorker.Data.Dtos;
 using MrPorker.Data.Enums;
 using Newtonsoft.Json;
@@ -7,8 +6,6 @@ using Newtonsoft.Json;
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
-using System;
-using System.Threading.Tasks;
 
 namespace MrPorker.Services
 {
@@ -41,23 +38,30 @@ namespace MrPorker.Services
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var measurements = await ConsumeDataAsync();
-                if (measurements != null)
+                try
                 {
-                    if (measurements.Paul != null)
+                    var measurements = await ConsumeDataAsync();
+                    if (measurements != null)
                     {
-                        await _measurementService.AddMeasurementAsync(measurements.Paul, Competitor.Paul);
-                    }
+                        if (measurements.Paul != null)
+                        {
+                            await _measurementService.AddMeasurementAsync(measurements.Paul, Competitor.Paul);
+                        }
 
-                    if (measurements.Addymer != null)
-                    {
-                        await _measurementService.AddMeasurementAsync(measurements.Addymer, Competitor.Addymer);
-                    }
+                        if (measurements.Addymer != null)
+                        {
+                            await _measurementService.AddMeasurementAsync(measurements.Addymer, Competitor.Addymer);
+                        }
 
-                    if (measurements.Alex != null)
-                    {
-                        await _measurementService.AddMeasurementAsync(measurements.Alex, Competitor.Alex);
+                        if (measurements.Alex != null)
+                        {
+                            await _measurementService.AddMeasurementAsync(measurements.Alex, Competitor.Alex);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred: " + ex.Message);
                 }
 
                 await Task.Delay(_pollingInterval);
