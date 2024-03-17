@@ -29,6 +29,11 @@ namespace MrPorker.Api
                 await timedMessagingService.SendStarterEmbedAsync(0, "Hello you fat fucks! It's time to weigh-in!");
             });
 
+            botApi.MapGet("/elo", async (DatabaseService databaseService) =>
+            {
+                await databaseService.RecalculateElo();
+            });
+
             botApi.MapGet("/unlock", async (FirebaseService firebaseService) =>
             {
                 await firebaseService.UnlockPhone();

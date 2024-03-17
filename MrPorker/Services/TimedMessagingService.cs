@@ -11,16 +11,32 @@ namespace MrPorker.Services
         private readonly TimeSpan _messageTime;
         private bool _messageSentToday = false;
 
-        private PersonalTrainerBotService _personalTrainerBot;
+        private readonly TimeSpan _strengthTime;
+        private bool _strengthSentToday = false;
+        private readonly TimeSpan _enduranceTime;
+        private bool _enduranceSentToday = false;
+        private readonly TimeSpan _agilityTime;
+        private bool _agilitySentToday = false;
+        private readonly TimeSpan _overallTime;
+        private bool _overallSentToday = false;
 
-        public TimedMessagingService(BotService botService, DatabaseService databaseService, BotConfig botConfig)
+        private PersonalTrainerBotService _personalTrainerBot;
+        private HogHoganBotService _hogHoganBot;
+
+        public TimedMessagingService(BotService botService, HogHoganBotService hogHoganBotService, DatabaseService databaseService, BotConfig botConfig)
         {
             _botConfig = botConfig;
             _botService = botService;
             _databaseService = databaseService;
-            _messageTime = new TimeSpan(4, 00, 0); // Example: 8:00 AM
+            _messageTime = new TimeSpan(4, 00, 0);
+
+            _strengthTime = new TimeSpan(16, 00, 0);
+            _enduranceTime = new TimeSpan(16, 00, 0);
+            _agilityTime = new TimeSpan(16, 00, 0);
+            _overallTime = new TimeSpan(16, 00, 0);
 
             _personalTrainerBot = new PersonalTrainerBotService(botConfig, databaseService);
+            _hogHoganBot = hogHoganBotService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -39,6 +55,42 @@ namespace MrPorker.Services
                 else if (now < _messageTime)
                 {
                     _messageSentToday = false;
+                }
+
+                if (now > _strengthTime && !_strengthSentToday)
+                {
+                    _strengthSentToday = await _hogHoganBot.SendStrengthRanking();
+                }
+                else if (now < _strengthTime)
+                {
+                    _strengthSentToday = false;
+                }
+
+                if (now > _enduranceTime && !_enduranceSentToday)
+                {
+                    _enduranceSentToday = await _hogHoganBot.SendEnduranceRanking();
+                }
+                else if (now < _enduranceTime)
+                {
+                    _enduranceSentToday = false;
+                }
+
+                if (now > _agilityTime && !_agilitySentToday)
+                {
+                    _agilitySentToday = await _hogHoganBot.SendAgilityRanking();
+                }
+                else if (now < _agilityTime)
+                {
+                    _agilitySentToday = false;
+                }
+
+                if (now > _overallTime && !_overallSentToday)
+                {
+                    _overallSentToday = await _hogHoganBot.SendOverallRanking();
+                }
+                else if (now < _overallTime)
+                {
+                    _overallSentToday = false;
                 }
 
                 // Wait for an hour before checking the time again
@@ -74,12 +126,12 @@ namespace MrPorker.Services
             embed.Description = phrase;
 
             embed.ThumbnailUrl = day < 312
-                ? "https://media.discordapp.net/attachments/756399558434619452/1163528687136821429/mrporkerproduction.png"
-                : "https://media.discordapp.net/attachments/721319129256296448/1163561057420312586/DALLE_2023-10-17_06.34.48_-_Dark_photo_focusing_on_a_big_pigs_face_where_the_boundary_between_beast_and_machine_blurs._Parts_of_its_skin_unveil_the_mechanical_structure_beneath.png";
+                ? "https://i.imgur.com/a4iB71L.png"
+                : "https://i.imgur.com/Wrwx5w1.png";
 
             if (day == 0)
             {
-                embed.ThumbnailUrl = "https://media.discordapp.net/attachments/1035886137996234832/1195959268474626108/mrporker.png";
+                embed.ThumbnailUrl = "https://i.imgur.com/hgX2vDP.png";
                 embed.Title = $"WEIGH-IN DAY";
             }
 

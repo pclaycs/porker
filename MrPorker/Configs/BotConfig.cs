@@ -15,17 +15,23 @@ namespace MrPorker.Configs
         public required ulong ParticipantRoleId { get; set; }
         public required ulong TalkerRoleId { get; set; }
 
+        //public required ulong ShameRoleId { get; set; }
+
         public required string BotToken { get; set; }
         public required string AddymerBotToken { get; set; }
         public required string AlexBotToken { get; set; }
         public required string EunoraBotToken { get; set; }
         public required string BluBotToken { get; set; }
         public required string PersonalTrainerBotToken { get; set; }
+        public required string HogHoganBotToken { get; set; }
+        
         public required ulong GuildHideoutId { get; set; }
-
         public required ulong ChannelGeneralId { get; set; }
         public required ulong ChannelPorkboardId { get; set; }
         public required ulong ChannelPorkCentralId { get; set; }
+
+        //public required ulong GuildPorkerId { get; set; }
+        //public required ulong ChannelPorkerMainId { get; set; }
 
         public required string HoroscopeThumbnail { get; set; }
         public required string HoroscopeUrl { get; set; }

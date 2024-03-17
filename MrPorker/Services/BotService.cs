@@ -29,6 +29,10 @@ namespace MrPorker.Services
             //await interactionService.AddCommandsGloballyAsync();
             await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
             await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
+
+
+            // GOOD SERVER: 
+            //await interactionService.RegisterCommandsToGuildAsync(config.GuildPorkerId);
         }
 
         private async Task OnInteractionCreatedAsync(SocketInteraction interaction)
