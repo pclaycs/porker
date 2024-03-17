@@ -49,6 +49,7 @@ var app = builder.Build();
 
 // Seed database
 var databaseService = app.Services.GetRequiredService<DatabaseService>();
+await databaseService.ApplyMigrations();
 await databaseService.SeedDatabaseAsync();
 
 // Initialize the Discord Bot

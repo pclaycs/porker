@@ -18,6 +18,15 @@ namespace MrPorker.Services
             return await action(dbContext);
         }
 
+        public async Task ApplyMigrations()
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                dbContext.Database.Migrate();
+                return Task.CompletedTask;
+            });
+        }
+
         public async Task SeedDatabaseAsync()
         {
             await WithDbContextAsync(async dbContext =>

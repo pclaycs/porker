@@ -69,7 +69,7 @@ namespace MrPorker.Services
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                //ExecutablePath = "/usr/bin/chromium-browser"
+                ExecutablePath = "/usr/bin/chromium-browser"
             });
 
             var measurementProperties = measurementDto.GetType().GetProperties();
