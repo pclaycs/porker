@@ -33,6 +33,7 @@ builder.Services.AddSingleton<EunoraBotService>();
 builder.Services.AddSingleton<BluBotService>();
 builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddSingleton<DatabaseService>();
+builder.Services.AddSingleton<HogHoganBotService>();
 builder.Services.AddSingleton<HoroscopeService>();
 builder.Services.AddSingleton<MeasurementService>();
 builder.Services.AddSingleton<FirebaseService>();
@@ -65,6 +66,9 @@ await eunoraBotService.RunAsync();
 
 var bluBotService = app.Services.GetRequiredService<BluBotService>();
 await bluBotService.RunAsync();
+
+var hogHoganBotService = app.Services.GetRequiredService<HogHoganBotService>();
+await hogHoganBotService.RunAsync();
 
 var timedMessagingService = app.Services.GetRequiredService<TimedMessagingService>();
 Task.Run(async () => await timedMessagingService.StartAsync(_cancellationTokenSource.Token));

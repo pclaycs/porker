@@ -50,7 +50,7 @@ namespace MrPorker.Services
             if (channel == null) return;
 
             var message = await channel.GetMessageAsync(cachedMessage.Id);
-            
+
             int xCount = 0;
             foreach (var reaction in message.Reactions)
             {
@@ -147,6 +147,14 @@ namespace MrPorker.Services
             await AddRoleAsync(_config.GuildHideoutId, _config.AlexDiscordId, _config.TalkerRoleId);
             await AddRoleAsync(_config.GuildHideoutId, _config.EunoraDiscordId, _config.TalkerRoleId);
             await AddRoleAsync(_config.GuildHideoutId, _config.BluDiscordId, _config.TalkerRoleId);
+
+            //// GOOD SERVER:
+            //await AddRoleAsync(_config.GuildPorkerId, _config.PaulDiscordId, _config.TalkerRoleId);
+            //await AddRoleAsync(_config.GuildPorkerId, _config.AddymerDiscordId, _config.TalkerRoleId);
+            //await AddRoleAsync(_config.GuildPorkerId, _config.AlexDiscordId, _config.TalkerRoleId);
+            //await AddRoleAsync(_config.GuildPorkerId, _config.EunoraDiscordId, _config.TalkerRoleId);
+
+
         }
 
         public async Task Judge()
@@ -178,8 +186,8 @@ namespace MrPorker.Services
                 {
                     var embed = new EmbedBuilder();
                     embed.Title = $"SUSPENSION";
-                    embed.Description = $"{target.DisplayName} did not weigh in yesterday.";
-                    embed.ThumbnailUrl = target.GetDisplayAvatarUrl();
+                    embed.Description = $"{target.DisplayName} did not weigh-in yesterday.";
+                    embed.ThumbnailUrl = target.GetDisplayAvatarUrl().Replace(".gif", ".png");
 
                     embed.Color = new Color(237, 66, 69);
                     var builtEmbed = embed.Build();
@@ -195,7 +203,7 @@ namespace MrPorker.Services
                     var embed = new EmbedBuilder();
                     embed.Title = $"WELCOME BACK";
                     embed.Description = $"Don't let me catch you slacking again, {target.DisplayName}.";
-                    embed.ThumbnailUrl = target.GetDisplayAvatarUrl();
+                    embed.ThumbnailUrl = target.GetDisplayAvatarUrl().Replace(".gif", ".png");
 
                     embed.Color = new Color(31, 139, 76);
                     var builtEmbed = embed.Build();

@@ -19,5 +19,13 @@
         public float MetabolicAge { get; set; }
 
         public string? Remarks { get; set; }
+
+        // HOG HOGAN PATCH
+        public float Height { get; set; }
+
+        public double Strength { get; set; }
+        public double Endurance { get; set; }
+        public double Agility { get; set; }
+        public double Overall { get; set; }
     }
 }

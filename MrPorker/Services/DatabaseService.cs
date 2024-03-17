@@ -40,6 +40,71 @@ namespace MrPorker.Services
             });
         }
 
+        public async Task RecalculateElo()
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                foreach (var measurement in dbContext.Measurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 177;
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                foreach (var measurement in dbContext.AddymerMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 175;
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                foreach (var measurement in dbContext.AlexMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 192;
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                foreach (var measurement in dbContext.EunoraMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 190;
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                foreach (var measurement in dbContext.BluMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 175;
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                await dbContext.SaveChangesAsync();
+
+                return Task.CompletedTask;
+            });
+        }
+
         public async Task<HoroscopeModel?> GetHoroscopeSignAsync(ulong userId)
         {
             return await WithDbContextAsync(async dbContext =>
@@ -63,6 +128,45 @@ namespace MrPorker.Services
                 await dbContext.SaveChangesAsync();
 
                 return Task.CompletedTask;
+            });
+        }
+
+        public async Task<MeasurementDto?> GetLatestMeasurementAsync(Competitor competitor)
+        {
+            return await WithDbContextAsync(async dbContext =>
+            {
+                if (competitor == Competitor.Addymer)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Paul)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Alex)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Eunora)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Blu)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+
+                return new MeasurementDto();
             });
         }
 

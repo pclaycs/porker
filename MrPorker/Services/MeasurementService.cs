@@ -8,7 +8,7 @@ using MrPorker.Data.Enums;
 
 namespace MrPorker.Services
 {
-    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService, EunoraBotService eunoraBotService, BluBotService bluBotService)
+    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService, EunoraBotService eunoraBotService, BluBotService bluBotService, HogHoganBotService hogHoganBotService)
     {
         private readonly BotConfig _botConfig = botConfig;
         private readonly BotService _botService = botService;
@@ -17,14 +17,39 @@ namespace MrPorker.Services
         private readonly EunoraBotService _eunoraBotService = eunoraBotService;
         private readonly BluBotService _bluBotService = bluBotService;
         private readonly DatabaseService _databaseService = databaseService;
+        private readonly HogHoganBotService _hogHoganBotService = hogHoganBotService;
 
         private readonly string _embedTemplateHtmlContent = File.ReadAllText(botConfig.EmbedTemplatePath);
         private readonly string _measurementTemplateHtmlContent = File.ReadAllText(botConfig.MeasurementTemplatePath);
 
         public async Task<IResult> AddMeasurementAsync(MeasurementDto measurementDto, Competitor competitor)
         {
+            var previousMeasurement = await _databaseService.GetLatestMeasurementAsync(competitor);
+
             await GenerateUiImagesAsync(measurementDto, competitor);
+
+            if (competitor == Competitor.Paul)
+                measurementDto.Height = 177;
+
+            if (competitor == Competitor.Alex)
+                measurementDto.Height = 192;
+
+            if (competitor == Competitor.Eunora)
+                measurementDto.Height = 190;
+
+            if (competitor == Competitor.Blu)
+                measurementDto.Height = 175;
+
+            if (competitor == Competitor.Addymer)
+                measurementDto.Height = 175;
+
+            measurementDto.Strength = CharacterRanking.CalculateStrengthScore(measurementDto);
+            measurementDto.Endurance = CharacterRanking.CalculateEnduranceScore(measurementDto);
+            measurementDto.Agility = CharacterRanking.CalculateAgilityScore(measurementDto);
+            measurementDto.Overall = CharacterRanking.CalculateOverallScore(measurementDto, measurementDto.Strength, measurementDto.Endurance, measurementDto.Agility);
+
             await _databaseService.AddMeasurementAsync(measurementDto, competitor);
+            await _hogHoganBotService.SendCompetitorUpdate(measurementDto, competitor, previousMeasurement);
 
             return Results.Ok();
         }
@@ -44,7 +69,7 @@ namespace MrPorker.Services
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                ExecutablePath = "/usr/bin/chromium-browser"
+                //ExecutablePath = "/usr/bin/chromium-browser"
             });
 
             var measurementProperties = measurementDto.GetType().GetProperties();
