@@ -51,20 +51,16 @@ namespace MrPorker
 
         public static string GetGrade(int score)
         {
-            if (score >= 9000)
-                return "S";
-            else if (score >= 8000)
-                return "A";
-            else if (score >= 7000)
-                return "B";
-            else if (score >= 6000)
-                return "C";
-            else if (score >= 4000)
-                return "D";
-            else if (score >= 2000)
-                return "E";
-            else
-                return "F";
+            return score switch
+            {
+                >= 9000 => "S",
+                >= 8000 => "A",
+                >= 7000 => "B",
+                >= 6000 => "C",
+                >= 4000 => "D",
+                >= 2000 => "E",
+                _ => "F"
+            };
         }
 
         public static ScoreHolder PopulateScoreHolder(Dictionary<SocketGuildUser, MeasurementDto> characters)
