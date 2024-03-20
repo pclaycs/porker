@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MrPorker.Configs;
 using MrPorker.Data;
 using MrPorker.Data.Dtos;
 using MrPorker.Data.Enums;
@@ -9,7 +10,7 @@ using System.Text.Json;
 
 namespace MrPorker.Services
 {
-    public class DatabaseService(IServiceProvider serviceProvider, IMapper mapper)
+    public class DatabaseService(IServiceProvider serviceProvider, IMapper mapper, BotConfig botConfig)
     {
         private async Task<TResult> WithDbContextAsync<TResult>(Func<BotDbContext, Task<TResult>> action)
         {
@@ -57,6 +58,7 @@ namespace MrPorker.Services
                 {
                     var dto = mapper.Map<MeasurementDto>(measurement);
                     dto.Height = 177;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Paul).GetAge();
 
                     measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
                     measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
@@ -68,6 +70,7 @@ namespace MrPorker.Services
                 {
                     var dto = mapper.Map<MeasurementDto>(measurement);
                     dto.Height = 175;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Addymer).GetAge();
 
                     measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
                     measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
@@ -79,6 +82,7 @@ namespace MrPorker.Services
                 {
                     var dto = mapper.Map<MeasurementDto>(measurement);
                     dto.Height = 192;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Alex).GetAge();
 
                     measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
                     measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
@@ -90,6 +94,7 @@ namespace MrPorker.Services
                 {
                     var dto = mapper.Map<MeasurementDto>(measurement);
                     dto.Height = 190;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Eunora).GetAge();
 
                     measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
                     measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
@@ -101,6 +106,7 @@ namespace MrPorker.Services
                 {
                     var dto = mapper.Map<MeasurementDto>(measurement);
                     dto.Height = 175;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Blu).GetAge();
 
                     measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
                     measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);

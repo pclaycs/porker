@@ -34,7 +34,7 @@ namespace MrPorker.Configs
             }
         };
 
-        private float GetAge()
+        public float GetAge()
         {
             var birthDate = new DateTime(BirthYear, BirthMonth, BirthDay);
             var currentDate = DateTime.Today;

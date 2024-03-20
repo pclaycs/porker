@@ -22,6 +22,7 @@
 
         // HOG HOGAN PATCH
         public float Height { get; set; }
+        public float Age { get; set; }
 
         public double Strength { get; set; }
         public double Endurance { get; set; }
