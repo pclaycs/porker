@@ -43,6 +43,7 @@ namespace MrPorker.Services
             if (competitor == Competitor.Addymer)
                 measurementDto.Height = 175;
 
+            measurementDto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(competitor).GetAge();
             measurementDto.Strength = CharacterRanking.CalculateStrengthScore(measurementDto);
             measurementDto.Endurance = CharacterRanking.CalculateEnduranceScore(measurementDto);
             measurementDto.Agility = CharacterRanking.CalculateAgilityScore(measurementDto);

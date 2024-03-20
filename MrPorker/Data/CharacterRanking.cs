@@ -15,30 +15,32 @@ namespace MrPorker
     {
         public static double CalculateStrengthScore(MeasurementDto measurement)
         {
-            var score = measurement.MuscleMass * (176 / measurement.Height);
+            var score = measurement.FatFreeBodyWeight * (1 - measurement.BodyFat / 100) * (measurement.BodyMassIndex / 25);
 
-            return StandardizeAndScaleScore(score, 45, 65);
+            return StandardizeAndScaleScore(score, 23, 80);
         }
 
         public static double CalculateEnduranceScore(MeasurementDto measurement)
         {
-            var score = (100 - measurement.BodyFat) * (measurement.Age / measurement.MetabolicAge);
+            double heightM = measurement.Height / 100.0;
+            var score = (measurement.BasalMetabolicRate + measurement.BodyWater * 10 + (measurement.FatFreeBodyWeight / Math.Pow(heightM, 2))) * (1 - measurement.BodyFat / 100) / 100;
 
-            return StandardizeAndScaleScore(score, 45, 110);
+            return StandardizeAndScaleScore(score, 12, 26);
         }
 
         public static double CalculateAgilityScore(MeasurementDto measurement)
         {
-            var score = (50 - measurement.BodyFat) * (measurement.MuscleMass / measurement.Weight);
+            var score = Math.Sqrt(measurement.MuscleMass) / Math.Sqrt(measurement.Weight) * 100 * Math.Exp(-measurement.BodyFat / 100) * (100 - measurement.BodyMassIndex) + 50;
 
-            return StandardizeAndScaleScore(score, 3, 36);
+            return StandardizeAndScaleScore(score, 4000, 7100);
         }
 
         public static double CalculateOverallScore(MeasurementDto measurement, double strengthScore, double enduranceScore, double agilityScore)
         {
-            var score = ((strengthScore * 2) + (enduranceScore * 0.5) + (agilityScore * 0.5)) / 3;
+            double heightM = measurement.Height / 100.0;
+            var score = (strengthScore * 0.7) + (enduranceScore * 0.15) + (agilityScore * 0.15) + (measurement.MuscleMass / Math.Pow(heightM, 2) * 0.6) + (measurement.BodyFat * 0.9);
 
-            return StandardizeAndScaleScore(score, 1, 10000);
+            return StandardizeAndScaleScore(score, 900, 10000);
         }
 
         private static double StandardizeAndScaleScore(double score, double minScore, double maxScore)
