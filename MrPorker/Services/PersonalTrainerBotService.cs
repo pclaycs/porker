@@ -36,7 +36,7 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToChannelAsync("there will be consequences for your absence.", _config.ChannelGeneralId);
+            // await SendMessageToChannelAsync("there will be consequences for your absence.", _config.ChannelGeneralId);
         }
 
         private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cachedChannel, SocketReaction socketReaction)

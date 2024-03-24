@@ -28,7 +28,7 @@ namespace MrPorker.Services
             // If you're using guild-specific commands, use the guild ID instead of null
             //await interactionService.AddCommandsGloballyAsync();
             await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
-            await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
+            // await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
 
 
             // GOOD SERVER: 
