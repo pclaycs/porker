@@ -36,7 +36,6 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await 
             // await SendMessageToChannelAsync("there will be consequences for your absence.", _config.ChannelGeneralId);
         }
 
