@@ -24,7 +24,7 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToChannelAsync("SIUUUUUUUUUUUUUUUU", _config.ChannelGeneralId);
+            // await SendMessageToChannelAsync("SIUUUUUUUUUUUUUUUU", _config.ChannelGeneralId);
         }
 
         public async Task SendMessageToChannelAsync(string content, ulong channelId)
