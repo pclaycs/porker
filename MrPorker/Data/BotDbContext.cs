@@ -12,6 +12,8 @@ namespace MrPorker.Data
         public DbSet<AlexMeasurementModel> AlexMeasurements { get; set; }
         public DbSet<EunoraMeasurementModel> EunoraMeasurements { get; set; }
         public DbSet<BluMeasurementModel> BluMeasurements { get; set; }
+        public DbSet<BraydenMeasurementModel> BraydenMeasurements { get; set; }
+        public DbSet<CbriMeasurementModel> CbriMeasurements { get; set; }
         public DbSet<PhraseModel> Phrases { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

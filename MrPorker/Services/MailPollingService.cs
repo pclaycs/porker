@@ -47,7 +47,7 @@ namespace MrPorker.Services
                     {
                         var message = _client.Inbox.GetMessage(uid);
 
-                        if (message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailEunora || message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailBlu)
+                        if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailEunora || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailBlu || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailAddymer || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailAlex || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailPaul || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailBrayden || message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailCbri)
                         {
                             foreach (var attachment in message.Attachments)
                             {
@@ -59,17 +59,47 @@ namespace MrPorker.Services
                                     var content = Encoding.UTF8.GetString(memoryStream.ToArray());
 
                                     // Process your MeasurementDto object as needed
-                                    if (message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailEunora)
+                                    if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailEunora)
                                     {
                                         var measurementDto = ParseData(content, false);
                                         if (measurementDto != null)
                                             await measurementService.AddMeasurementAsync(measurementDto, Competitor.Eunora);
                                     }
-                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address == botConfig.EmailBlu)
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailBlu)
                                     {
                                         var measurementDto = ParseData(content, true);
                                         if (measurementDto != null)
                                             await measurementService.AddMeasurementAsync(measurementDto, Competitor.Blu);
+                                    }
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailAddymer)
+                                    {
+                                        var measurementDto = ParseData(content, true);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Addymer);
+                                    }
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailAlex)
+                                    {
+                                        var measurementDto = ParseData(content, true);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Alex);
+                                    }
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailPaul)
+                                    {
+                                        var measurementDto = ParseData(content, true);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Paul);
+                                    }
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailBrayden)
+                                    {
+                                        var measurementDto = ParseData(content, true);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Brayden);
+                                    }
+                                    else if (message.From.Mailboxes.FirstOrDefault()?.Address.ToLower() == botConfig.EmailCbri)
+                                    {
+                                        var measurementDto = ParseData(content, true);
+                                        if (measurementDto != null)
+                                            await measurementService.AddMeasurementAsync(measurementDto, Competitor.Cbri);
                                     }
                                 }
                             }
@@ -109,7 +139,23 @@ namespace MrPorker.Services
             "subcutaneousFat", "visceralFat", "bodyWater", "skeletalMuscle", "muscleMass",
             "boneMass", "protein", "basalMetabolicRate", "metabolicAge", "remarks"
             };
-            var values = rows[1].Split(',');
+
+            string lastDataRow = null;
+            for (int i = rows.Length - 1; i >= 0; i--)
+            {
+                if (!string.IsNullOrWhiteSpace(rows[i]))
+                {
+                    lastDataRow = rows[i];
+                    break;
+                }
+            }
+
+            if (lastDataRow == null)
+            {
+                return null;
+            }
+
+            var values = lastDataRow.Split(',');
             var result = headers.Zip(values, (header, value) => new { header, value })
                                 .ToDictionary(x => x.header, x => x.value);
 

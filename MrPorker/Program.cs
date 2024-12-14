@@ -31,6 +31,8 @@ builder.Services.AddSingleton<AddymerBotService>();
 builder.Services.AddSingleton<AlexBotService>();
 builder.Services.AddSingleton<EunoraBotService>();
 builder.Services.AddSingleton<BluBotService>();
+builder.Services.AddSingleton<BraydenBotService>();
+builder.Services.AddSingleton<CbriBotService>();
 builder.Services.AddDbContext<BotDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<HogHoganBotService>();
@@ -67,6 +69,12 @@ await eunoraBotService.RunAsync();
 
 var bluBotService = app.Services.GetRequiredService<BluBotService>();
 await bluBotService.RunAsync();
+
+var braydenBotService = app.Services.GetRequiredService<BraydenBotService>();
+await braydenBotService.RunAsync();
+
+var cbriBotService = app.Services.GetRequiredService<CbriBotService>();
+await cbriBotService.RunAsync();
 
 var hogHoganBotService = app.Services.GetRequiredService<HogHoganBotService>();
 await hogHoganBotService.RunAsync();

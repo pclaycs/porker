@@ -9,7 +9,7 @@ namespace MrPorker.Api.Controllers
 
         public async Task<IResult> Ping()
         {
-            await _botService.SendMessageToChannelAsync("pong", botConfig.ChannelGeneralId);
+            await _botService.SendMessageToChannelAsync("pong", botConfig.ChannelPorkOffGeneralId);
             return Results.Ok();
         }
     }

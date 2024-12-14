@@ -7,5 +7,7 @@
         Addymer = 3,
         Eunora = 4,
         Blu = 5,
+        Brayden = 6,
+        Cbri = 7,
     }
 }

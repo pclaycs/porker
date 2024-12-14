@@ -27,8 +27,8 @@ namespace MrPorker.Services
         {
             // If you're using guild-specific commands, use the guild ID instead of null
             //await interactionService.AddCommandsGloballyAsync();
-            await interactionService.RegisterCommandsToGuildAsync(config.GuildHideoutId);
-            await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
+            await interactionService.RegisterCommandsToGuildAsync(config.GuildPorkOffId);
+            //await SendMessageToChannelAsync("good heavens", config.ChannelGeneralId);
 
 
             // GOOD SERVER: 
@@ -50,7 +50,14 @@ namespace MrPorker.Services
 
             var twitterLink = ReplaceTwitterLinks(message.Content);
             if (twitterLink != null)
-                await message.Channel.SendMessageAsync(twitterLink);
+            {
+                if (message is SocketUserMessage userMessage)
+                {
+                    var mentionString = userMessage.Author.Mention;
+                    await userMessage.DeleteAsync();
+                    await message.Channel.SendMessageAsync(mentionString + " sent: " + twitterLink, allowedMentions: AllowedMentions.None);
+                }
+            }
         }
 
         private string? ReplaceTwitterLinks(string message)
@@ -85,6 +92,48 @@ namespace MrPorker.Services
                 Console.WriteLine($"Failed to send file to channel ID: {channelId}");
 
             return null;
+        }
+
+        public async Task<IUserMessage?> SendImageEmbedToChannelAsync(MemoryStream imageStream, ulong threadId)
+        {
+            var thread = client.GetGuild(config.GuildPorkOffId).GetThreadChannel(threadId);
+            if (thread == null) return null;
+
+            var embed = new EmbedBuilder()
+                .WithImageUrl("attachment://output.png")
+                .WithColor(Color.Blue)
+            .Build();
+
+            return await thread.SendFileAsync(imageStream, "output.png", embed: embed);
+        }
+
+        public async Task<IUserMessage?> SendHeader(IThreadChannel thread)
+        {
+            var embed = new EmbedBuilder()
+                .WithImageUrl("https://i.imgur.com/sF72DRf.png")
+                .WithColor(Color.Blue)
+            .Build();
+
+            return await thread.SendMessageAsync(embed: embed);
+
+            //if (await client.GetChannelAsync(channelId) is IMessageChannel channel)
+            //{
+
+            //}
+            //else
+            //{
+            //    Console.WriteLine($"Failed to send file to channel ID: {channelId}");
+            //}
+
+            //return null;
+        }
+
+        public async Task<IUserMessage?> SendFileToThreadAsync(MemoryStream imageStream, ulong threadId)
+        {
+            var thread = client.GetGuild(config.GuildPorkOffId).GetThreadChannel(threadId);
+            if (thread == null) return null;
+
+            return await thread.SendFileAsync(imageStream, "output.png");
         }
     }
 }

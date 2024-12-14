@@ -24,7 +24,7 @@ namespace MrPorker.Services
 
         private async Task OnReadyAsync()
         {
-            await SendMessageToChannelAsync("SIUUUUUUUUUUUUUUUU", _config.ChannelGeneralId);
+            //await SendMessageToChannelAsync("SIUUUUUUUUUUUUUUUU", _config.ChannelGeneralId);
         }
 
         public async Task SendMessageToChannelAsync(string content, ulong channelId)
@@ -41,6 +41,27 @@ namespace MrPorker.Services
                 await channel.SendFileAsync(imageStream, "output.png");
             else
                 Console.WriteLine($"Failed to send file to channel ID: {channelId}");
+        }
+
+        public async Task<IUserMessage?> SendImageEmbedToChannelAsync(MemoryStream imageStream, ulong threadId)
+        {
+            var thread = _client.GetGuild(_config.GuildPorkOffId).GetThreadChannel(threadId);
+            if (thread == null) return null;
+
+            var embed = new EmbedBuilder()
+                .WithImageUrl("attachment://output.png")
+                .WithColor(Color.Blue)
+            .Build();
+
+            return await thread.SendFileAsync(imageStream, "output.png", embed: embed);
+        }
+
+        public async Task<IUserMessage?> SendFileToThreadAsync(MemoryStream imageStream, ulong threadId)
+        {
+            var thread = _client.GetGuild(_config.GuildPorkOffId).GetThreadChannel(threadId);
+            if (thread == null) return null;
+
+            return await thread.SendFileAsync(imageStream, "output.png");
         }
     }
 }

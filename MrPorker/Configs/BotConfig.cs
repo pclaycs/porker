@@ -11,27 +11,44 @@ namespace MrPorker.Configs
         public required ulong AlexDiscordId { get; set; }
         public required ulong EunoraDiscordId { get; set; }
         public required ulong BluDiscordId { get; set; }
-        
-        public required ulong ParticipantRoleId { get; set; }
-        public required ulong TalkerRoleId { get; set; }
+        public required ulong BraydenDiscordId { get; set; }
+        public required ulong CbriDiscordId { get; set; }
 
-        //public required ulong ShameRoleId { get; set; }
+        public required ulong PaulPorkerId { get; set; }
+        public required ulong AddymerPorkerId { get; set; }
+        public required ulong AlexPorkerId { get; set; }
+        public required ulong EunoraPorkerId { get; set; }
+        public required ulong BluPorkerId { get; set; }
+        public required ulong BraydenPorkerId { get; set; }
+        public required ulong CbriPorkerId { get; set; }
+
+        public required ulong ShameRoleId { get; set; }
+
+        public required ulong Rank1RoleId { get; set; }
+        public required ulong Rank2RoleId { get; set; }
+        public required ulong Rank3RoleId { get; set; }
+        public required ulong Rank4RoleId { get; set; }
+        public required ulong Rank5RoleId { get; set; }
+        public required ulong Rank6RoleId { get; set; }
+        public required ulong Rank7RoleId { get; set; } 
 
         public required string BotToken { get; set; }
         public required string AddymerBotToken { get; set; }
         public required string AlexBotToken { get; set; }
         public required string EunoraBotToken { get; set; }
         public required string BluBotToken { get; set; }
+        public required string BraydenBotToken { get; set; }
+        public required string CbriBotToken { get; set; }
         public required string PersonalTrainerBotToken { get; set; }
         public required string HogHoganBotToken { get; set; }
-        
-        public required ulong GuildHideoutId { get; set; }
-        public required ulong ChannelGeneralId { get; set; }
-        public required ulong ChannelPorkboardId { get; set; }
-        public required ulong ChannelPorkCentralId { get; set; }
 
-        //public required ulong GuildPorkerId { get; set; }
-        //public required ulong ChannelPorkerMainId { get; set; }
+        public required ulong GuildPorkOffId { get; set; }
+
+        public required ulong ChannelLeaderboardId { get; set; }
+        public required ulong ChannelMatchHistoryId { get; set; }
+        public required ulong ChannelPorkOffGeneralId { get; set; }
+
+        public required ulong ChannelHideoutId { get; set; }
 
         public required string HoroscopeThumbnail { get; set; }
         public required string HoroscopeUrl { get; set; }
@@ -55,6 +72,11 @@ namespace MrPorker.Configs
         public required string EmailPassword { get; set; }
         public required string EmailEunora { get; set; }
         public required string EmailBlu { get; set; }
+        public required string EmailAddymer { get; set; }
+        public required string EmailAlex { get; set; }
+        public required string EmailPaul { get; set; }
+        public required string EmailBrayden { get; set; }
+        public required string EmailCbri { get; set; }
         public required int EmailPollingInSeconds { get; set; }
 
 
@@ -63,6 +85,8 @@ namespace MrPorker.Configs
         public MeasurementThresholdConfig AlexMeasurementThresholds { get; set; }
         public MeasurementThresholdConfig EunoraMeasurementThresholds { get; set; }
         public MeasurementThresholdConfig BluMeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig BraydenMeasurementThresholds { get; set; }
+        public MeasurementThresholdConfig CbriMeasurementThresholds { get; set; }
 
         public MeasurementThresholdConfig GetMeasurementThresholdConfigByCompetitor(Competitor competitor)
         {
@@ -80,6 +104,12 @@ namespace MrPorker.Configs
 
             if (competitor == Competitor.Blu)
                 return BluMeasurementThresholds;
+
+            if (competitor == Competitor.Brayden)
+                return BraydenMeasurementThresholds;
+
+            if (competitor == Competitor.Cbri)
+                return CbriMeasurementThresholds;
 
             return new MeasurementThresholdConfig();
         }

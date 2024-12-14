@@ -57,6 +57,16 @@ namespace MrPorker.Services
                         {
                             await _measurementService.AddMeasurementAsync(measurements.Alex, Competitor.Alex);
                         }
+
+                        if (measurements.Brayden != null)
+                        {
+                            await _measurementService.AddMeasurementAsync(measurements.Brayden, Competitor.Brayden);
+                        }
+
+                        if (measurements.Cbri != null)
+                        {
+                            await _measurementService.AddMeasurementAsync(measurements.Cbri, Competitor.Cbri);
+                        }
                     }
                 }
                 catch (Exception ex)

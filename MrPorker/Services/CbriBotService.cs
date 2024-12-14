@@ -5,12 +5,12 @@ using System.Threading.Channels;
 
 namespace MrPorker.Services
 {
-    public class BluBotService
+    public class CbriBotService
     {
         private readonly DiscordSocketClient _client;
         private readonly BotConfig _config;
 
-        public BluBotService(BotConfig config)
+        public CbriBotService(BotConfig config)
         {
             _config = config;
             _client = new DiscordSocketClient();
@@ -19,7 +19,7 @@ namespace MrPorker.Services
         public async Task RunAsync()
         {
             _client.Ready += OnReadyAsync;
-            await _client.LoginAsync(TokenType.Bot, _config.BluBotToken);
+            await _client.LoginAsync(TokenType.Bot, _config.CbriBotToken);
             await _client.StartAsync();
         }
 

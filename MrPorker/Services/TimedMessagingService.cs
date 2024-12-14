@@ -11,15 +11,6 @@ namespace MrPorker.Services
         private readonly TimeSpan _messageTime;
         private bool _messageSentToday = false;
 
-        private readonly TimeSpan _strengthTime;
-        private bool _strengthSentToday = false;
-        private readonly TimeSpan _enduranceTime;
-        private bool _enduranceSentToday = false;
-        private readonly TimeSpan _agilityTime;
-        private bool _agilitySentToday = false;
-        private readonly TimeSpan _overallTime;
-        private bool _overallSentToday = false;
-
         private PersonalTrainerBotService _personalTrainerBot;
         private HogHoganBotService _hogHoganBot;
 
@@ -29,11 +20,6 @@ namespace MrPorker.Services
             _botService = botService;
             _databaseService = databaseService;
             _messageTime = new TimeSpan(4, 00, 0);
-
-            _strengthTime = new TimeSpan(16, 00, 0);
-            _enduranceTime = new TimeSpan(16, 00, 0);
-            _agilityTime = new TimeSpan(16, 00, 0);
-            _overallTime = new TimeSpan(16, 00, 0);
 
             _personalTrainerBot = new PersonalTrainerBotService(botConfig, databaseService);
             _hogHoganBot = hogHoganBotService;
@@ -57,41 +43,6 @@ namespace MrPorker.Services
                     _messageSentToday = false;
                 }
 
-                if (now > _strengthTime && !_strengthSentToday)
-                {
-                    _strengthSentToday = await _hogHoganBot.SendStrengthRanking();
-                }
-                else if (now < _strengthTime)
-                {
-                    _strengthSentToday = false;
-                }
-
-                if (now > _enduranceTime && !_enduranceSentToday)
-                {
-                    _enduranceSentToday = await _hogHoganBot.SendEnduranceRanking();
-                }
-                else if (now < _enduranceTime)
-                {
-                    _enduranceSentToday = false;
-                }
-
-                if (now > _agilityTime && !_agilitySentToday)
-                {
-                    _agilitySentToday = await _hogHoganBot.SendAgilityRanking();
-                }
-                else if (now < _agilityTime)
-                {
-                    _agilitySentToday = false;
-                }
-
-                if (now > _overallTime && !_overallSentToday)
-                {
-                    _overallSentToday = await _hogHoganBot.SendOverallRanking();
-                }
-                else if (now < _overallTime)
-                {
-                    _overallSentToday = false;
-                }
 
                 // Wait for an hour before checking the time again
                 await Task.Delay(TimeSpan.FromHours(1), cancellationToken);
@@ -115,7 +66,7 @@ namespace MrPorker.Services
 
         public async Task<bool> SendStarterEmbedAsync(int day, string phrase)
         {
-            await _personalTrainerBot.GiveAllRoles();
+            //await _personalTrainerBot.GiveAllRoles();
             return await SendEmbedAsync(day, phrase);
         }
 
@@ -138,20 +89,13 @@ namespace MrPorker.Services
             embed.Color = new Color(88, 101, 242);
             var builtEmbed = embed.Build();
 
-            var message = await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelPorkboardId);
+            await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelHideoutId);
+
+            var message = await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelMatchHistoryId);
             if (message == null) return false;
 
-            var component = new ComponentBuilder()
-                .WithButton(label: "oink!",
-                            style: ButtonStyle.Link,
-                            url: $"https://discord.com/channels/{_botConfig.GuildHideoutId}/{_botConfig.ChannelPorkboardId}/{message.Id}",
-                            emote: new Emoji("🐷"))
-                .Build();
-
-            await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelGeneralId, component);
-            await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelPorkCentralId, component);
-
-            return true;
+            var message2 = await _botService.SendEmbedToChannelAsync(builtEmbed, _botConfig.ChannelPorkOffGeneralId);
+            return message2 != null;
         }
     }
 

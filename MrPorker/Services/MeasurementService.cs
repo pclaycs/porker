@@ -8,7 +8,7 @@ using MrPorker.Data.Enums;
 
 namespace MrPorker.Services
 {
-    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService, EunoraBotService eunoraBotService, BluBotService bluBotService, HogHoganBotService hogHoganBotService)
+    public class MeasurementService(BotConfig botConfig, BotService botService, DatabaseService databaseService, AddymerBotService addymerBotService, AlexBotService alexBotService, EunoraBotService eunoraBotService, BluBotService bluBotService, BraydenBotService braydenBotService, CbriBotService cbriBotService, HogHoganBotService hogHoganBotService)
     {
         private readonly BotConfig _botConfig = botConfig;
         private readonly BotService _botService = botService;
@@ -16,6 +16,8 @@ namespace MrPorker.Services
         private readonly AlexBotService _alexBotService = alexBotService;
         private readonly EunoraBotService _eunoraBotService = eunoraBotService;
         private readonly BluBotService _bluBotService = bluBotService;
+        private readonly BraydenBotService _braydenBotService = braydenBotService;
+        private readonly CbriBotService _cbriBotService = cbriBotService;
         private readonly DatabaseService _databaseService = databaseService;
         private readonly HogHoganBotService _hogHoganBotService = hogHoganBotService;
 
@@ -25,8 +27,6 @@ namespace MrPorker.Services
         public async Task<IResult> AddMeasurementAsync(MeasurementDto measurementDto, Competitor competitor)
         {
             var previousMeasurement = await _databaseService.GetLatestMeasurementAsync(competitor);
-
-            await GenerateUiImagesAsync(measurementDto, competitor);
 
             if (competitor == Competitor.Paul)
                 measurementDto.Height = 177;
@@ -43,6 +43,12 @@ namespace MrPorker.Services
             if (competitor == Competitor.Addymer)
                 measurementDto.Height = 175;
 
+            if (competitor == Competitor.Brayden)
+                measurementDto.Height = 178;
+
+            if (competitor == Competitor.Cbri)
+                measurementDto.Height = 188;
+
             measurementDto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(competitor).GetAge();
             measurementDto.Strength = CharacterRanking.CalculateStrengthScore(measurementDto);
             measurementDto.Endurance = CharacterRanking.CalculateEnduranceScore(measurementDto);
@@ -50,12 +56,19 @@ namespace MrPorker.Services
             measurementDto.Overall = CharacterRanking.CalculateOverallScore(measurementDto, measurementDto.Strength, measurementDto.Endurance, measurementDto.Agility);
 
             await _databaseService.AddMeasurementAsync(measurementDto, competitor);
-            await _hogHoganBotService.SendCompetitorUpdate(measurementDto, competitor, previousMeasurement);
+            var threadIds = await _hogHoganBotService.SendCompetitorUpdate(measurementDto, competitor, previousMeasurement);
 
+            foreach (var threadId in threadIds)
+            {
+                if (threadId != null)
+                    await GenerateUiImagesAsync(measurementDto, competitor, (ulong)threadId);
+            }
+
+            await _hogHoganBotService.UpdateLeaderboard(competitor);
             return Results.Ok();
         }
 
-        private async Task GenerateUiImagesAsync(MeasurementDto measurementDto, Competitor competitor)
+        private async Task GenerateUiImagesAsync(MeasurementDto measurementDto, Competitor competitor, ulong threadId)
         {
             var measurementHistory = new MeasurementHistoryDto
             {
@@ -71,6 +84,7 @@ namespace MrPorker.Services
             {
                 Headless = true,
                 ExecutablePath = "/usr/bin/chromium-browser"
+                //ExecutablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
             });
 
             var measurementProperties = measurementDto.GetType().GetProperties();
@@ -95,13 +109,13 @@ namespace MrPorker.Services
             }
 
             // i don't know why i called these chunks i just like the word chunk
-            await SendMessageForChunk(primaryChunk, measurementHistory, browser, competitor);
-            await SendMessageForChunk(secondaryChunk, measurementHistory, browser, competitor);
+            await SendMessageForChunk(primaryChunk, measurementHistory, browser, competitor, threadId);
+            await SendMessageForChunk(secondaryChunk, measurementHistory, browser, competitor, threadId);
 
             await browser.CloseAsync();
         }
 
-        private async Task SendMessageForChunk(List<PropertyInfo> chunk, MeasurementHistoryDto measurementHistory, IBrowser browser, Competitor competitor)
+        private async Task SendMessageForChunk(List<PropertyInfo> chunk, MeasurementHistoryDto measurementHistory, IBrowser browser, Competitor competitor, ulong threadId)
         {
             var embedDocument = new HtmlDocument();
             embedDocument.LoadHtml(_embedTemplateHtmlContent);
@@ -113,19 +127,19 @@ namespace MrPorker.Services
                 {
                     if (property.PropertyType == typeof(float))
                     {
-                        if (string.Equals(property.Name.ToLower(), "weight"))
-                        {
-                            if (competitor == Competitor.Addymer)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/xyniH6c.png\"></img></div>\n";
-                            else if (competitor == Competitor.Paul)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/sF72DRf.png\"></img></div>\n";
-                            else if (competitor == Competitor.Alex)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/FAU0d5E.png\"></img></div>\n";
-                            else if (competitor == Competitor.Eunora)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/4FlSVKz.png\"></img></div>\n";
-                            else if (competitor == Competitor.Blu)
-                                embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/NCrZxCC.png\"></img></div>\n";
-                        }
+                        //if (string.Equals(property.Name.ToLower(), "weight"))
+                        //{
+                        //    if (competitor == Competitor.Addymer)
+                        //        embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/xyniH6c.png\"></img></div>\n";
+                        //    else if (competitor == Competitor.Paul)
+                        //        embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/sF72DRf.png\"></img></div>\n";
+                        //    else if (competitor == Competitor.Alex)
+                        //        embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/FAU0d5E.png\"></img></div>\n";
+                        //    else if (competitor == Competitor.Eunora)
+                        //        embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/4FlSVKz.png\"></img></div>\n";
+                        //    else if (competitor == Competitor.Blu)
+                        //        embedNode.InnerHtml += "<div class=\"title\"><img src=\"https://i.imgur.com/NCrZxCC.png\"></img></div>\n";
+                        //}
 
                         if (!string.Equals(property.Name.ToLower(), "weight") && !string.Equals(property.Name.ToLower(), "bodywater"))
                             embedNode.InnerHtml += "<div class=\"top-spacer\"></div>\n";
@@ -188,15 +202,19 @@ namespace MrPorker.Services
                 imageStream.Position = 0;
 
                 if (competitor == Competitor.Addymer)
-                    await _addymerBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                    await _addymerBotService.SendFileToThreadAsync(imageStream, threadId);
                 else if (competitor == Competitor.Paul)
-                    await _botService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                    await _botService.SendFileToThreadAsync(imageStream, threadId);
                 else if (competitor == Competitor.Alex)
-                    await _alexBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                    await _alexBotService.SendFileToThreadAsync(imageStream, threadId);
                 else if (competitor == Competitor.Eunora)
-                    await _eunoraBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                    await _eunoraBotService.SendFileToThreadAsync(imageStream, threadId);
                 else if (competitor == Competitor.Blu)
-                    await _bluBotService.SendFileToChannelAsync(imageStream, _botConfig.ChannelPorkboardId);
+                    await _bluBotService.SendFileToThreadAsync(imageStream, threadId);
+                else if (competitor == Competitor.Brayden)
+                    await _braydenBotService.SendFileToThreadAsync(imageStream, threadId);
+                else if (competitor == Competitor.Cbri)
+                    await _cbriBotService.SendFileToThreadAsync(imageStream, threadId);
             }
         }
 

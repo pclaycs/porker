@@ -114,6 +114,30 @@ namespace MrPorker.Services
                     measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
                 }
 
+                foreach (var measurement in dbContext.BraydenMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 178;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Brayden).GetAge();
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
+                foreach (var measurement in dbContext.CbriMeasurements)
+                {
+                    var dto = mapper.Map<MeasurementDto>(measurement);
+                    dto.Height = 188;
+                    dto.Age = botConfig.GetMeasurementThresholdConfigByCompetitor(Competitor.Cbri).GetAge();
+
+                    measurement.Strength = CharacterRanking.CalculateStrengthScore(dto);
+                    measurement.Endurance = CharacterRanking.CalculateEnduranceScore(dto);
+                    measurement.Agility = CharacterRanking.CalculateAgilityScore(dto);
+                    measurement.Overall = CharacterRanking.CalculateOverallScore(dto, measurement.Strength, measurement.Endurance, measurement.Agility);
+                }
+
                 await dbContext.SaveChangesAsync();
 
                 return Task.CompletedTask;
@@ -180,6 +204,76 @@ namespace MrPorker.Services
                         .OrderByDescending(m => m.Timestamp)
                         .FirstOrDefaultAsync());
                 }
+                else if (competitor == Competitor.Brayden)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BraydenMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Cbri)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.CbriMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .FirstOrDefaultAsync());
+                }
+
+                return new MeasurementDto();
+            });
+        }
+
+        public async Task<MeasurementDto?> GetSecondLatestMeasurementAsync(Competitor competitor)
+        {
+            return await WithDbContextAsync(async dbContext =>
+            {
+                if (competitor == Competitor.Addymer)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Paul)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Alex)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Eunora)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Blu)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Brayden)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BraydenMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Cbri)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.CbriMeasurements
+                        .OrderByDescending(m => m.Timestamp)
+                        .Skip(1)
+                        .FirstOrDefaultAsync());
+                }
 
                 return new MeasurementDto();
             });
@@ -206,33 +300,80 @@ namespace MrPorker.Services
             {
                 if (competitor == Competitor.Addymer)
                 {
-                    return mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
+                    var result = mapper.Map<MeasurementDto>(await dbContext.AddymerMeasurements
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
                 }
                 else if (competitor == Competitor.Paul)
                 {
-                    return mapper.Map<MeasurementDto>(await dbContext.Measurements
+                    var result = mapper.Map<MeasurementDto>(await dbContext.Measurements
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
                 }
                 else if (competitor == Competitor.Alex)
                 {
-                    return mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
+                    var result = mapper.Map<MeasurementDto>(await dbContext.AlexMeasurements
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
                 }
                 else if (competitor == Competitor.Eunora)
                 {
-                    return mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
+                    var result = mapper.Map<MeasurementDto>(await dbContext.EunoraMeasurements
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
                 }
                 else if (competitor == Competitor.Blu)
                 {
-                    return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
+                    var result = mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
+                }
+                else if (competitor == Competitor.Brayden)
+                {
+                    var result = mapper.Map<MeasurementDto>(await dbContext.BraydenMeasurements
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
+                        .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
+                }
+                else if (competitor == Competitor.Cbri)
+                {
+                    var result = mapper.Map<MeasurementDto>(await dbContext.CbriMeasurements
+                        .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
+                        .FirstOrDefaultAsync());
+
+                    if (result == null && x == 1)
+                        result = await GetSecondLatestMeasurementAsync(competitor);
+
+                    return result;
                 }
 
                 return new MeasurementDto();
@@ -266,6 +407,16 @@ namespace MrPorker.Services
                 else if (competitor == Competitor.Blu)
                 {
                     return mapper.Map<MeasurementDto>(await dbContext.BluMeasurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Brayden)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.BraydenMeasurements
+                        .FirstOrDefaultAsync());
+                }
+                else if (competitor == Competitor.Cbri)
+                {
+                    return mapper.Map<MeasurementDto>(await dbContext.CbriMeasurements
                         .FirstOrDefaultAsync());
                 }
 
@@ -302,6 +453,16 @@ namespace MrPorker.Services
                     var measurementModel = mapper.Map<BluMeasurementModel>(measurementDto);
                     dbContext.BluMeasurements.Add(measurementModel);
                 }
+                else if (competitor == Competitor.Brayden)
+                {
+                    var measurementModel = mapper.Map<BraydenMeasurementModel>(measurementDto);
+                    dbContext.BraydenMeasurements.Add(measurementModel);
+                }
+                else if (competitor == Competitor.Cbri)
+                {
+                    var measurementModel = mapper.Map<CbriMeasurementModel>(measurementDto);
+                    dbContext.CbriMeasurements.Add(measurementModel);
+                }
 
                 await dbContext.SaveChangesAsync();
 
@@ -323,7 +484,7 @@ namespace MrPorker.Services
                     var timestampDateTime = DateTimeOffset.FromUnixTimeSeconds(result.Timestamp).DateTime;
 
                     // Calculate the number of days since the timestamp
-                    return Convert.ToInt32(Math.Floor((DateTime.Now - timestampDateTime).TotalDays));
+                    return Convert.ToInt32(Math.Floor((DateTime.Now - timestampDateTime).TotalDays)) - 76;
                 }
 
                 return -1;
