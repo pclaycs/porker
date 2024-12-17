@@ -279,7 +279,7 @@ namespace MrPorker.Services
             });
         }
 
-        public async Task<MeasurementDto?> GetXthMostRecentMeasurementAsync(int x, Competitor competitor)
+        public async Task<MeasurementDto?> GetXthMostRecentMeasurementAsync(int x, Competitor competitor, bool decree = false)
         {
             if (x < 1) return null;
 
@@ -304,7 +304,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -315,7 +315,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -326,7 +326,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -337,7 +337,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -348,7 +348,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -359,7 +359,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;
@@ -370,7 +370,7 @@ namespace MrPorker.Services
                         .Where(m => m.Timestamp >= startTimestamp && m.Timestamp < endTimestamp)
                         .FirstOrDefaultAsync());
 
-                    if (result == null && x == 1)
+                    if (result == null && x == 1 && !decree)
                         result = await GetSecondLatestMeasurementAsync(competitor);
 
                     return result;

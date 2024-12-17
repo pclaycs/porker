@@ -145,13 +145,13 @@ namespace MrPorker.Services
 
         public async Task Judge()
         {
-            var paulYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Paul);
-            var addymerYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Addymer);
-            var alexYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Alex);
-            var eunoraYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Eunora);
-            var bluYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Blu);
-            var braydenYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Brayden);
-            var cbriYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Cbri);
+            var paulYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Paul, true);
+            var addymerYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Addymer, true);
+            var alexYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Alex, true);
+            var eunoraYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Eunora, true);
+            var bluYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Blu, true);
+            var braydenYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Brayden, true);
+            var cbriYesterday = await _databaseService.GetXthMostRecentMeasurementAsync(1, Competitor.Cbri, true);
 
             Thread.Sleep(3000);
 
